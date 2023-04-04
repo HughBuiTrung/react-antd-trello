@@ -20,6 +20,8 @@ function App() {
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
 
+  console.log('truong')
+
   const handleSubmit = (values) => {
     console.log('values: ', values)
 
