@@ -146,3 +146,10 @@ main {
 .selectField .ant-avatar {
   margin-left: 0;
 }
+.listContainer {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
+  white-space: nowrap;
+  height: 100%;
+}
