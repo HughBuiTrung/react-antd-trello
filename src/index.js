@@ -6,7 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 // styles
 import "./index.css";
 // context
-import { AppProvider } from "./context/DataContext";
+import { AppProvider } from "./context/AppContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
