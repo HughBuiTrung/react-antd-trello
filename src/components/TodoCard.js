@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Card, Avatar, Tooltip, Popconfirm, Modal } from "antd";
 import {
   EditOutlined,
@@ -9,10 +9,14 @@ import {
 } from "@ant-design/icons";
 import Meta from "antd/es/card/Meta";
 import { Draggable } from "react-beautiful-dnd";
-export default function TodoList({ index, card, setOpen }) {
+import { AppContext } from "../context/DataContext";
+export default function TodoList({ index, card, setOpen, columnsId }) {
+  const data = useContext(AppContext);
+  const [cards, setCards] = useState(data.lists[columnsId].cards);
+  console.log("data: ", data);
+  console.log("card: ", card);
   function handleViewDetail() {
     // const [open, setOpen] = useState(false);
-
     Modal.info({
       title: "Card Detail",
       content: (
@@ -50,6 +54,18 @@ export default function TodoList({ index, card, setOpen }) {
       onOk() {},
     });
   }
+  function onConfirm(cardId) {
+    console.log("cardDeleteId", cardId);
+    console.log("columnsId: ", columnsId);
+    console.log("======= ", data.lists[columnsId]);
+    const cloneCards = [...cards];
+    const indexCard = cloneCards.findIndex((index) => index === cardId);
+    cloneCards.splice(indexCard, 1);
+    setCards(cloneCards);
+    // data.lists[columnsId].cards = cloneCards;
+    console.log("indexCard: ", indexCard);
+    console.log("cards: ", cloneCards);
+  }
   return (
     <>
       <Draggable draggableId={String(card.id)} index={index}>
@@ -72,7 +88,7 @@ export default function TodoList({ index, card, setOpen }) {
                 <Popconfirm
                   title="Delete the card"
                   description="Are you sure to delete this card?"
-                  onConfirm={() => {}}
+                  onConfirm={() => onConfirm(card.id)}
                   onCancel={() => {}}
                   okText="Yes"
                   cancelText="No"

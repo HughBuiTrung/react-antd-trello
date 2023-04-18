@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
-import { Card, Avatar, Tooltip, Modal, Input, Form, Select } from "antd";
+import { Avatar, Tooltip, Modal, Input, Form, Select } from "antd";
+
 const { TextArea } = Input;
 const { Option } = Select;
 export default function ModalCard({ open, setOpen }) {

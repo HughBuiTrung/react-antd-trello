@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { Card, Tooltip, Button, Popconfirm } from "antd";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import TodoCard from "./components/TodoCard";
 import ModalCard from "./components/ModalCard";
-import { data } from "./components/data";
+import { AppContext } from "./context/DataContext";
+// import { data } from "./components/data";
+
 const options = [];
 for (let i = 10; i < 36; i++) {
   options.push({
@@ -14,12 +16,95 @@ for (let i = 10; i < 36; i++) {
 }
 
 function App() {
+  const data = useContext(AppContext);
+  const [dataCards, setDataCards] = useState(data);
+  const [listCards_1, setListCards_1] = useState(data.lists["list-1"].cards);
+  const [listCards_2, setListCards_2] = useState(data.lists["list-2"].cards);
+  const [columns, setColumns] = useState(data.columns);
   const [open, setOpen] = useState(false);
+  console.log("daas", columns);
 
-  function onDragEnd() {
-    console.log("onDragEnd");
+  data.lists["list-1"].cards = listCards_1;
+  data.lists["list-2"].cards = listCards_2;
+
+  data.columns = columns;
+  console.log("dataCards: ", dataCards);
+
+  function onDragEnd(result) {
+    console.log("result: ", result);
+
+    const destinationId = result.destination.droppableId;
+    const destinationIndex = result.destination.index;
+
+    const sourceId = result.source.droppableId;
+    const sourceIndex = result.source.index;
+    const cloneListCards_1 = [...listCards_1];
+    const cloneListCards_2 = [...listCards_2];
+
+    console.log("destinationId: ", destinationId);
+    console.log("sourceId: ", sourceId);
+
+    if (destinationId === "list-1" && sourceId === "list-1") {
+      const cloneListCards = [...listCards_1];
+
+      cloneListCards.splice(
+        destinationIndex,
+        0,
+        cloneListCards.splice(sourceIndex, 1)[0]
+      );
+      setListCards_1(cloneListCards);
+    }
+    if (destinationId === "list-2" && sourceId === "list-2") {
+      const cloneListCards = [...listCards_2];
+
+      cloneListCards.splice(
+        destinationIndex,
+        0,
+        cloneListCards.splice(sourceIndex, 1)[0]
+      );
+      setListCards_2(cloneListCards);
+    }
+    if (destinationId === "all-list" && sourceId === "all-list") {
+      const cloneColums = [...columns];
+
+      cloneColums.splice(
+        destinationIndex,
+        0,
+        cloneColums.splice(sourceIndex, 1)[0]
+      );
+      setColumns(cloneColums);
+    }
+    if (sourceId === "list-1" && destinationId === "list-2") {
+      cloneListCards_1.splice(sourceIndex, 1);
+      cloneListCards_2.splice(destinationIndex, 0, result.draggableId);
+      console.log("cloneListCards_1: ", cloneListCards_1);
+      console.log("cloneListCards_2: ", cloneListCards_2);
+      setListCards_1(cloneListCards_1);
+      setListCards_2(cloneListCards_2);
+    }
+    if (sourceId === "list-2" && destinationId === "list-1") {
+      cloneListCards_2.splice(sourceIndex, 1);
+      cloneListCards_1.splice(destinationIndex, 0, result.draggableId);
+      console.log("cloneListCards_1: ", cloneListCards_1);
+      console.log("cloneListCards_2: ", cloneListCards_2);
+      setListCards_1(cloneListCards_1);
+      setListCards_2(cloneListCards_2);
+    }
   }
-
+  function onConfirm(listId) {
+    console.log("before data.columns: ", data.columns);
+    const dataColumns = [...data.columns];
+    const listIndex = dataColumns.findIndex((index) => index === listId);
+    dataColumns.splice(listIndex, 1);
+    setColumns(dataColumns);
+    console.log("listIndex: ", listIndex);
+    console.log("data.columns: ", data.columns);
+    console.log("columns: ", columns);
+  }
+  useEffect(() => {
+    console.log("render");
+  }, [columns]);
+  console.log("RENDER");
   return (
     <>
       <header>
@@ -50,6 +135,7 @@ function App() {
                   >
                     {data.columns.map((columnsId, index) => {
                       const listItem = data.lists[columnsId];
+
                       const cards = listItem.cards.map((cardId) => {
                         return data.cards[cardId];
                       });
@@ -87,7 +173,9 @@ function App() {
                                           <Popconfirm
                                             title="Delete the list"
                                             description="Are you sure to delete this list?"
-                                            onConfirm={() => {}}
+                                            onConfirm={() =>
+                                              onConfirm(listItem.id)
+                                            }
                                             onCancel={() => {}}
                                             okText="Yes"
                                             cancelText="No"
@@ -114,6 +202,7 @@ function App() {
                                             card={cards}
                                             key={cards.id}
                                             setOpen={setOpen}
+                                            columnsId={columnsId}
                                           />
                                         ))}
 
@@ -141,94 +230,6 @@ function App() {
         </div>
       </main>
 
-      {/* <Modal
-        title="Add Card"
-        open={open}
-        onOk={form.submit}
-        onCancel={handleCancel}
-        confirmLoading={confirmLoading}
-      >
-        <br />
-        <Form
-          name="basic"
-          form={form}
-          initialValues={{ status: "new" }}
-          onFinish={handleSubmit}
-          autoComplete="off"
-          labelCol={{ flex: "110px" }}
-          labelAlign="left"
-          wrapperCol={{ flex: 1 }}
-        >
-          <Form.Item
-            label="Title"
-            name="title"
-            rules={[{ required: true, message: "Please input your title!" }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            label="Description"
-            name="description"
-            rules={[
-              { required: true, message: "Please input your description!" },
-            ]}
-          >
-            <TextArea rows={4} />
-          </Form.Item>
-
-          <Form.Item
-            label="Member"
-            name="member"
-            rules={[
-              { required: true, message: "Please input your description!" },
-            ]}
-          >
-            <Select
-              mode="multiple"
-              allowClear
-              style={{ width: "100%" }}
-              placeholder="Please select"
-              optionLabelProp="label"
-              onChange={handleChange}
-            >
-              <Option value="tony123" label="tony 123">
-                <div className="selectField">
-                  <Avatar src="https://picsum.photos/id/237/200/300" />
-                  <span>Tony Nguyen</span>
-                </div>
-              </Option>
-              <Option value="phuong123" label="phuong 123">
-                <div className="selectField">
-                  <Avatar src="https://picsum.photos/id/237/200/300" />
-                  <span>Phuong Nguyen</span>
-                </div>
-              </Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item label="Status" name="status">
-            <Select
-              style={{ width: 120 }}
-              onChange={handleChange}
-              options={[
-                {
-                  value: "new",
-                  label: "New",
-                },
-                {
-                  value: "inprocess",
-                  label: "In process",
-                },
-                {
-                  value: "done",
-                  label: "Done",
-                },
-              ]}
-            />
-          </Form.Item>
-        </Form>
-      </Modal> */}
       <ModalCard open={open} setOpen={setOpen} />
     </>
   );
