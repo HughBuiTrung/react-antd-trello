@@ -37,14 +37,17 @@ export const AppProvider = ({ children }) => {
       ];
       const sourceIndex = result.source.index;
       const destinationIndex = result.destination.index;
-
       const cardMove = sourceCards.splice(sourceIndex, 1);
       destinationCards.splice(destinationIndex, 0, cardMove[0]);
-      console.log(sourceCards);
-      console.log(destinationCards);
-      setTrackers((prevState) => ({
-        ...prevState,
-      }));
+      const { lists } = trackers;
+      lists[source.droppableId].cards = sourceCards;
+      lists[destination.droppableId].cards = destinationCards;
+      setTrackers((prevState) => {
+        console.log("prevState: ", prevState);
+        return {
+          ...prevState,
+        };
+      });
     }
   }
   console.log("trackers: ", trackers);
