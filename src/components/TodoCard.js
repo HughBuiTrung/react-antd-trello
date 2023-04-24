@@ -9,8 +9,18 @@ import {
 } from "@ant-design/icons";
 import Meta from "antd/es/card/Meta";
 import { Draggable } from "react-beautiful-dnd";
-export default function TodoList({ index, card, setOpen, columnsId }) {
-  function onConfirm(cardId) {}
+export default function TodoList({
+  index,
+  card,
+  setOpen,
+  columnsId,
+  takeIdCard,
+}) {
+  function onConfirm(cardId) {
+    console.log("cardId: ", cardId);
+    console.log("columnsId: ", columnsId);
+    takeIdCard(cardId, columnsId);
+  }
   return (
     <>
       <Draggable draggableId={String(card.id)} index={index}>

@@ -5,7 +5,7 @@ export const AppContext = React.createContext();
 
 export const AppProvider = ({ children }) => {
   const [trackers, setTrackers] = React.useState(data);
-
+  const [idAddList, setIdAddList] = React.useState();
   function handleDragList(result) {
     const { source, destination } = result;
     const columns = [...trackers.columns];
@@ -40,13 +40,48 @@ export const AppProvider = ({ children }) => {
 
       const cardMove = sourceCards.splice(sourceIndex, 1);
       destinationCards.splice(destinationIndex, 0, cardMove[0]);
-      console.log(sourceCards);
-      console.log(destinationCards);
-      setTrackers((prevState) => ({
-        ...prevState,
-      }));
+      console.log("sourceCards: ", sourceCards);
+      console.log("destinationCards: ", destinationCards);
+
+      setTrackers((prevState) => {
+        console.log("prevState: ", prevState);
+        return {
+          ...prevState,
+        };
+      });
     }
   }
+
+  function handleDeleteList(listId) {
+    const columns = [...trackers.columns];
+    const indexList = columns.findIndex((index) => index === listId);
+    columns.splice(indexList, 1);
+    console.log(columns);
+    setTrackers((prevState) => ({ ...prevState, columns }));
+  }
+  function handleDeleteCard(cardId, columnsId) {
+    console.log(trackers.lists[columnsId]);
+    const cards = trackers.lists[columnsId].cards;
+    const cardIndex = cards.findIndex((index) => index === cardId);
+    cards.splice(cardIndex, 1);
+    console.log(cards);
+    setTrackers((prevState) => ({ ...prevState }));
+  }
+  function handleTakeIdAddList(idAddList) {
+    console.log("idAddList: ", idAddList);
+    setIdAddList(idAddList);
+  }
+  function handleAddCard(value) {
+    // const indexList = trackers.columns.indexOf(idAddList);
+    // trackers.lists[idAddList].cards.push(value);
+    const { title, description, member } = value;
+    console.log("title: ", title);
+    console.log("value: ", value);
+    console.log("idAddList: ", idAddList);
+  }
+
+  // console.log("idAddList: ", idAddList);
+
   console.log("trackers: ", trackers);
   return (
     <AppContext.Provider
@@ -57,6 +92,10 @@ export const AppProvider = ({ children }) => {
         // actions
         handleDragList,
         handleDragCard,
+        handleDeleteList,
+        handleDeleteCard,
+        handleAddCard,
+        handleTakeIdAddList,
       }}
     >
       {children}
