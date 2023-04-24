@@ -15,7 +15,15 @@ import ModalCard from "./components/ModalCard";
 import { useAppContext } from "./context/AppContext";
 
 function App() {
-  const { trackers, handleDragList, handleDragCard } = useAppContext();
+  const {
+    trackers,
+    handleDragList,
+    handleDragCard,
+    handleDeleteList,
+    handleDeleteCard,
+    handleAddCard,
+    handleTakeIdAddList,
+  } = useAppContext();
   const [open, setOpen] = useState(false);
 
   function onDragEnd(result) {
@@ -36,8 +44,22 @@ function App() {
     // drag card
     // handleDragCard(result);
   }
- 
-
+  function onConfirm(listId) {
+    handleDeleteList(listId);
+  }
+  function takeIdCard(cardId, columnsId) {
+    console.log("cardId App: ", cardId);
+    handleDeleteCard(cardId, columnsId);
+  }
+  function takeValueAddCard(value) {
+    handleAddCard(value);
+  }
+  function takeIdAddList(idAddList) {
+    handleTakeIdAddList(idAddList);
+  }
+  function handleAddAnotherList() {
+    console.log("handleAddAnotherList");
+  }
   return (
     <>
       <header>
@@ -99,7 +121,10 @@ function App() {
                                             <Button
                                               shape="circle"
                                               icon={<PlusOutlined />}
-                                              onClick={() => setOpen(true)}
+                                              onClick={() => (
+                                                setOpen(true),
+                                                takeIdAddList(listItem.id)
+                                              )}
                                             />
                                           </Tooltip>
 
@@ -107,11 +132,7 @@ function App() {
                                             title="Delete the list"
                                             description="Are you sure to delete this list?"
                                             onConfirm={() =>
-                                              // onConfirm(listItem.id)
-                                              console.log(
-                                                "listItem.id: ",
-                                                listItem.id
-                                              )
+                                              onConfirm(listItem.id)
                                             }
                                             onCancel={() => {}}
                                             okText="Yes"
@@ -140,6 +161,7 @@ function App() {
                                             key={cards.id}
                                             setOpen={setOpen}
                                             columnsId={columnsId}
+                                            takeIdCard={takeIdCard}
                                           />
                                         ))}
 
@@ -159,15 +181,20 @@ function App() {
                   </div>
                 )}
               </Droppable>
-              <Button type="text">
-                <PlusOutlined /> Add another list
+              <Button type="text" onClick={handleAddAnotherList}>
+                <PlusOutlined />
+                Add another list
               </Button>
             </DragDropContext>
           </div>
         </div>
       </main>
 
-      <ModalCard open={open} setOpen={setOpen} />
+      <ModalCard
+        open={open}
+        setOpen={setOpen}
+        takeValueAddCard={takeValueAddCard}
+      />
     </>
   );
 }

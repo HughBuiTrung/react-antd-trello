@@ -4,13 +4,13 @@ import { Avatar, Tooltip, Modal, Input, Form, Select } from "antd";
 
 const { TextArea } = Input;
 const { Option } = Select;
-export default function ModalCard({ open, setOpen }) {
+export default function ModalCard({ open, setOpen, takeValueAddCard }) {
   const [form] = Form.useForm();
   const [confirmLoading, setConfirmLoading] = useState(false);
 
   const handleSubmit = (values) => {
     console.log("values: ", values);
-
+    takeValueAddCard(values);
     setConfirmLoading(true);
   };
   const handleCancel = () => {
@@ -65,7 +65,7 @@ export default function ModalCard({ open, setOpen }) {
       open={open}
       onOk={form.submit}
       onCancel={handleCancel}
-      confirmLoading={confirmLoading}
+      // confirmLoading={confirmLoading}
     >
       <br />
       <Form
