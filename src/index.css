@@ -156,3 +156,13 @@ main {
   white-space: nowrap;
   height: 100%;
 }
+
+
+.todoList__content {
+  flex: 1 1 auto;
+  padding: 0 5px;
+  min-height: 10px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  margin-bottom: 0;
+}

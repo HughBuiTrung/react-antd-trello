@@ -12,9 +12,10 @@ import { Draggable } from "react-beautiful-dnd";
 export default function TodoList({
   index,
   card,
-  setOpen,
+  setModal,
   columnsId,
   takeIdCard,
+  listId
 }) {
   function onConfirm(cardId) {
     console.log("cardId: ", cardId);
@@ -38,7 +39,9 @@ export default function TodoList({
                   <FileTextOutlined key="view" />
                 </Tooltip>,
                 <Tooltip title="Edit">
-                  <EditOutlined key="edit" onClick={() => setOpen(true)} />
+                  <EditOutlined key="edit" onClick={() => {
+                    setModal({ type: 'EDIT_CARD', listId })
+                  }} />
                 </Tooltip>,
                 <Popconfirm
                   title="Delete the card"
@@ -56,7 +59,7 @@ export default function TodoList({
               ]}
             >
               <Meta
-                title="Learn javascript"
+                title={card.title}
                 description={
                   <>
                     <div>This is description {card.id}</div>

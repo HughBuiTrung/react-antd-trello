@@ -21,10 +21,9 @@ function App() {
     handleDragCard,
     handleDeleteList,
     handleDeleteCard,
-    handleAddCard,
     handleTakeIdAddList,
   } = useAppContext();
-  const [open, setOpen] = useState(false);
+  const [modal, setModal] = useState(null);
 
   function onDragEnd(result) {
     const { destination, type } = result;
@@ -44,22 +43,25 @@ function App() {
     // drag card
     // handleDragCard(result);
   }
+
   function onConfirm(listId) {
     handleDeleteList(listId);
   }
+
   function takeIdCard(cardId, columnsId) {
     console.log("cardId App: ", cardId);
     handleDeleteCard(cardId, columnsId);
   }
-  function takeValueAddCard(value) {
-    handleAddCard(value);
-  }
+
+
   function takeIdAddList(idAddList) {
     handleTakeIdAddList(idAddList);
   }
+
   function handleAddAnotherList() {
     console.log("handleAddAnotherList");
   }
+
   return (
     <>
       <header>
@@ -121,10 +123,12 @@ function App() {
                                             <Button
                                               shape="circle"
                                               icon={<PlusOutlined />}
-                                              onClick={() => (
-                                                setOpen(true),
-                                                takeIdAddList(listItem.id)
-                                              )}
+                                              onClick={() => {
+                                                setModal({
+                                                  type: "ADD_CARD",
+                                                  listId: listItem.id
+                                                })
+                                              }}
                                             />
                                           </Tooltip>
 
@@ -152,17 +156,22 @@ function App() {
                                       <div
                                         ref={provided.innerRef}
                                         style={{}}
+                                        className="todoList__content"
                                         {...provided.droppableProps}
                                       >
                                         {cards.map((cards, cardIndex) => (
-                                          <TodoCard
-                                            index={cardIndex}
-                                            card={cards}
-                                            key={cards.id}
-                                            setOpen={setOpen}
-                                            columnsId={columnsId}
-                                            takeIdCard={takeIdCard}
-                                          />
+                                          <>
+                                            <TodoCard
+                                              index={cardIndex}
+                                              card={cards}
+                                              key={cards.id}
+                                              listId={listItem.id}
+                                              setModal={setModal}
+                                              columnsId={columnsId}
+                                              takeIdCard={takeIdCard}
+                                            />
+                                            <br />
+                                          </>
                                         ))}
 
                                         {provided.placeholder}
@@ -191,9 +200,8 @@ function App() {
       </main>
 
       <ModalCard
-        open={open}
-        setOpen={setOpen}
-        takeValueAddCard={takeValueAddCard}
+        modal={modal}
+        setModal={setModal}
       />
     </>
   );

@@ -2,19 +2,31 @@ import React from "react";
 import { useState } from "react";
 import { Avatar, Tooltip, Modal, Input, Form, Select } from "antd";
 
+// context
+import { useAppContext } from "../context/AppContext";
+
 const { TextArea } = Input;
 const { Option } = Select;
-export default function ModalCard({ open, setOpen, takeValueAddCard }) {
+
+export default function ModalCard({ modal, setModal }) {
+  
+  const {
+    handleAddCard,
+  } = useAppContext();
+
   const [form] = Form.useForm();
   const [confirmLoading, setConfirmLoading] = useState(false);
 
   const handleSubmit = (values) => {
-    console.log("values: ", values);
-    takeValueAddCard(values);
+    handleAddCard({
+      listId: modal.listId,
+      values
+    });
     setConfirmLoading(true);
   };
+
   const handleCancel = () => {
-    setOpen(false);
+    setModal(null);
   };
 
   const handleChange = (value) => {
@@ -59,10 +71,13 @@ export default function ModalCard({ open, setOpen, takeValueAddCard }) {
       onOk() {},
     });
   }
+
+  if(!modal) return <></>
+
   return (
     <Modal
       title="Add Card"
-      open={open}
+      open={Boolean(modal)}
       onOk={form.submit}
       onCancel={handleCancel}
       // confirmLoading={confirmLoading}

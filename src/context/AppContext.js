@@ -6,6 +6,7 @@ export const AppContext = React.createContext();
 export const AppProvider = ({ children }) => {
   const [trackers, setTrackers] = React.useState(data);
   const [idAddList, setIdAddList] = React.useState();
+
   function handleDragList(result) {
     const { source, destination } = result;
     const columns = [...trackers.columns];
@@ -58,6 +59,7 @@ export const AppProvider = ({ children }) => {
     console.log(columns);
     setTrackers((prevState) => ({ ...prevState, columns }));
   }
+
   function handleDeleteCard(cardId, columnsId) {
     console.log(trackers.lists[columnsId]);
     const cards = trackers.lists[columnsId].cards;
@@ -66,17 +68,18 @@ export const AppProvider = ({ children }) => {
     console.log(cards);
     setTrackers((prevState) => ({ ...prevState }));
   }
-  function handleTakeIdAddList(idAddList) {
-    console.log("idAddList: ", idAddList);
-    setIdAddList(idAddList);
+
+  function handleTakeIdAddList() {
+    // console.log("idAddList: ", idAddList);
+    // setIdAddList(idAddList);
   }
-  function handleAddCard(value) {
-    // const indexList = trackers.columns.indexOf(idAddList);
-    // trackers.lists[idAddList].cards.push(value);
-    const { title, description, member } = value;
-    console.log("title: ", title);
-    console.log("value: ", value);
-    console.log("idAddList: ", idAddList);
+
+  function handleAddCard({ listId, values }) {
+    const card = {
+      ...values,
+      id: `card-${Date.now()}`,
+    }
+    console.log("value: ", card, listId);
   }
 
   // console.log("idAddList: ", idAddList);
