@@ -116,21 +116,36 @@ export const AppProvider = ({ children }) => {
 
   function handleAddList(value) {
     console.log("handleAddListConText: ", value);
-    const { columns } = trackers;
-    columns.push(value);
-    console.log("columns: ", columns);
+    // const { columns } = trackers;
+    // columns.push(value);
+    // console.log("columns: ", columns);
 
-    const lists = {
-      ...trackers.lists,
-      [`list-${Date.now()}`]: {
-        id: `list-${Date.now()}`,
-        title: value,
-        cards: [],
-      },
-    };
-    setTrackers((prevState) => ({ ...prevState, lists }));
+    // const lists = {
+    //   ...trackers.lists,
+    //   [`list-${Date.now()}`]: {
+    //     id: `list-${Date.now()}`,
+    //     title: value,
+    //     cards: [],
+    //   },
+    // };
+    // setTrackers((prevState) => ({ ...prevState, lists }));
     // console.log("cardssss: ", lists[lists.id].cards);
-    console.log("lists: ", lists);
+
+    setTrackers(prevState => {
+      const nameList = `${value}-${Date.now()}`;
+      return {
+        ...prevState,
+        columns: [...prevState.columns, nameList],
+        lists: {
+          ...prevState.lists,
+          [nameList]: {
+            id: nameList,
+            title: value,
+            cards: [],
+          }
+        }
+      }
+    })
   }
 
   console.log("modalAppContext: ", modal);

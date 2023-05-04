@@ -33,13 +33,21 @@ export default function ModalCard() {
     console.log(`selected ${value}`);
   };
 
+
+  React.useLayoutEffect(() => {
+    form.resetFields();  
+  })
+
   if (!modal) return <></>;
+
   if (modal.type === "ADD_CARD") {
     modalTitle = "Add Card";
   }
   if (modal.type === "EDIT_CARD") {
     modalTitle = "Edit Card";
   }
+
+
   return (
     <Modal
       title={modalTitle}
@@ -52,7 +60,12 @@ export default function ModalCard() {
       <Form
         name="basic"
         form={form}
-        initialValues={{ status: "new" }}
+        initialValues={{ 
+          title: modal?.card?.title,
+          description: modal?.card?.description,
+          member: modal?.card?.member?.length > 0 ? modal?.card?.member.map(item => item.name) : [],
+          status: "new" ,
+        }}
         onFinish={handleSubmit}
         autoComplete="off"
         labelCol={{ flex: "110px" }}
@@ -64,7 +77,7 @@ export default function ModalCard() {
           name="title"
           rules={[{ required: true, message: "Please input your title!" }]}
         >
-          <Input />
+          <Input  />
         </Form.Item>
 
         <Form.Item

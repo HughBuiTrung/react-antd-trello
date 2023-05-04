@@ -104,10 +104,10 @@ function App() {
                   >
                     {trackers.columns.map((columnsId, index) => {
                       const listItem = trackers.lists[columnsId];
-
                       const cards = listItem.cards.map((cardId) => {
                         return trackers.cards[cardId];
                       });
+                      
                       return (
                         <React.Fragment key={listItem.id}>
                           <Draggable
