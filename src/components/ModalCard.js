@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { Avatar, Tooltip, Modal, Input, Form, Select } from "antd";
 
@@ -8,21 +8,21 @@ import { useAppContext } from "../context/AppContext";
 const { TextArea } = Input;
 const { Option } = Select;
 
-export default function ModalCard({ modal, setModal }) {
-  
-  const {
-    handleAddCard,
-  } = useAppContext();
-
+export default function ModalCard() {
+  const { handleAddCard, modal, setModal, handleEditCard } = useAppContext();
+  var modalTitle = "";
   const [form] = Form.useForm();
   const [confirmLoading, setConfirmLoading] = useState(false);
 
   const handleSubmit = (values) => {
     handleAddCard({
       listId: modal.listId,
-      values
+      values,
     });
     setConfirmLoading(true);
+    form.resetFields();
+    setModal(null);
+    handleEditCard(values);
   };
 
   const handleCancel = () => {
@@ -33,50 +33,16 @@ export default function ModalCard({ modal, setModal }) {
     console.log(`selected ${value}`);
   };
 
-  function handleViewDetail() {
-    Modal.info({
-      title: "Card Detail",
-      content: (
-        <>
-          <div>
-            <h4>Title</h4>
-            <div>This is title</div>
-          </div>
-          <br />
-          <div>
-            <h4>Description</h4>
-            <div>This is description</div>
-          </div>
-          <br />
-          <div>
-            <h4>Member</h4>
-            <div>
-              <Avatar.Group>
-                <Tooltip title="Tony Nguyen" placement="top">
-                  <Avatar src="https://picsum.photos/265/160" />
-                </Tooltip>
-                <Tooltip title="Phuong Nguyen" placement="top">
-                  <Avatar src="https://picsum.photos/265/160" />
-                </Tooltip>
-              </Avatar.Group>
-            </div>
-          </div>
-          <br />
-          <div>
-            <h4>Status</h4>
-            <div>New</div>
-          </div>
-        </>
-      ),
-      onOk() {},
-    });
+  if (!modal) return <></>;
+  if (modal.type === "ADD_CARD") {
+    modalTitle = "Add Card";
   }
-
-  if(!modal) return <></>
-
+  if (modal.type === "EDIT_CARD") {
+    modalTitle = "Edit Card";
+  }
   return (
     <Modal
-      title="Add Card"
+      title={modalTitle}
       open={Boolean(modal)}
       onOk={form.submit}
       onCancel={handleCancel}
