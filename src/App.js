@@ -14,6 +14,12 @@ import ModalCard from "./components/ModalCard";
 // context
 import { useAppContext } from "./context/AppContext";
 
+// Router
+
+import { Link } from "react-router-dom";
+import Login from "./components/Login";
+import ModalAppList from "./components/ModalAddList";
+
 function App() {
   const {
     trackers,
@@ -22,9 +28,11 @@ function App() {
     handleDeleteList,
     handleDeleteCard,
     handleTakeIdAddList,
+    handleAddList,
+    modal,
+    setModal,
   } = useAppContext();
-  const [modal, setModal] = useState(null);
-
+  // const [modal, setModal] = useState(null);
   function onDragEnd(result) {
     const { destination, type } = result;
     if (!destination) return;
@@ -49,17 +57,15 @@ function App() {
   }
 
   function takeIdCard(cardId, columnsId) {
-    console.log("cardId App: ", cardId);
     handleDeleteCard(cardId, columnsId);
   }
-
 
   function takeIdAddList(idAddList) {
     handleTakeIdAddList(idAddList);
   }
 
-  function handleAddAnotherList() {
-    console.log("handleAddAnotherList");
+  function handleAddAnotherList(value) {
+    handleAddList(value);
   }
 
   return (
@@ -68,8 +74,14 @@ function App() {
         <div className="header__container">
           <div className="header__logo" />
           <div className="header__right">
+            <div className="login">
+              <Link to="/login">Login</Link>
+            </div>
+            <div className="register">
+              <Link to="/register">Register</Link>
+            </div>
             <div className="header__avatar">
-              <img src="/assets/images/avatar.png" alt="Avatar" />
+              {/* <img src="/assets/images/avatar.png" alt="Avatar" /> */}
             </div>
           </div>
         </div>
@@ -126,8 +138,8 @@ function App() {
                                               onClick={() => {
                                                 setModal({
                                                   type: "ADD_CARD",
-                                                  listId: listItem.id
-                                                })
+                                                  listId: listItem.id,
+                                                });
                                               }}
                                             />
                                           </Tooltip>
@@ -169,6 +181,7 @@ function App() {
                                               setModal={setModal}
                                               columnsId={columnsId}
                                               takeIdCard={takeIdCard}
+                                              modal={modal}
                                             />
                                             <br />
                                           </>
@@ -190,19 +203,22 @@ function App() {
                   </div>
                 )}
               </Droppable>
-              <Button type="text" onClick={handleAddAnotherList}>
+
+              <ModalAppList handleAddAnotherList={handleAddAnotherList} />
+
+              {/* <Button type="text" onClick={handleAddAnotherList}>
                 <PlusOutlined />
                 Add another list
-              </Button>
+              </Button> */}
             </DragDropContext>
           </div>
         </div>
       </main>
 
-      <ModalCard
-        modal={modal}
-        setModal={setModal}
-      />
+      <ModalCard />
+
+      {/* <Login />
+      <Register /> */}
     </>
   );
 }

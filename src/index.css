@@ -157,7 +157,6 @@ main {
   height: 100%;
 }
 
-
 .todoList__content {
   flex: 1 1 auto;
   padding: 0 5px;
@@ -165,4 +164,12 @@ main {
   overflow-x: hidden;
   overflow-y: auto;
   margin-bottom: 0;
+}
+.register {
+  margin: 0px 10px;
+}
+
+.loginForm,
+.registerForm {
+  margin: 50px auto;
 }

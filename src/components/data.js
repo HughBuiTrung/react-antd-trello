@@ -48,7 +48,7 @@ export const data = {
     },
     "card-2-2": {
       id: "card-2-2",
-      title: "Card 1-1",
+      title: "Card 2-2",
       description: "NEW",
       member: [
         {

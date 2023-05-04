@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { Card, Avatar, Tooltip, Popconfirm, Modal } from "antd";
 import {
   EditOutlined,
@@ -9,19 +9,65 @@ import {
 } from "@ant-design/icons";
 import Meta from "antd/es/card/Meta";
 import { Draggable } from "react-beautiful-dnd";
+import { useAppContext } from "../context/AppContext";
 export default function TodoList({
   index,
   card,
   setModal,
   columnsId,
   takeIdCard,
-  listId
+  listId,
+  modal,
 }) {
   function onConfirm(cardId) {
     console.log("cardId: ", cardId);
     console.log("columnsId: ", columnsId);
     takeIdCard(cardId, columnsId);
   }
+
+  function handleView() {
+    const { member } = card;
+
+    Modal.info({
+      title: "Card Detail",
+      content: (
+        <>
+          <div>
+            <h4>Title</h4>
+            <div>{card.title}</div>
+          </div>
+          <br />
+          <div>
+            <h4>Description</h4>
+            <div>{card.description}</div>
+          </div>
+          <br />
+          <div>
+            <h4>Member</h4>
+            <div>
+              {member[0].name}
+
+              {/* <Avatar.Group>
+                <Tooltip title="Tony Nguyen" placement="top">
+                  <Avatar src="https://picsum.photos/265/160" />
+                </Tooltip>
+                <Tooltip title="Phuong Nguyen" placement="top">
+                  <Avatar src="https://picsum.photos/265/160" />
+                </Tooltip>
+              </Avatar.Group> */}
+            </div>
+          </div>
+          <br />
+          <div>
+            <h4>Status</h4>
+            <div>New</div>
+          </div>
+        </>
+      ),
+      onOk() {},
+    });
+  }
+
   return (
     <>
       <Draggable draggableId={String(card.id)} index={index}>
@@ -36,12 +82,15 @@ export default function TodoList({
               cover={<img alt="example" src="https://picsum.photos/265/160" />}
               actions={[
                 <Tooltip title="View">
-                  <FileTextOutlined key="view" />
+                  <FileTextOutlined key="view" onClick={handleView} />
                 </Tooltip>,
                 <Tooltip title="Edit">
-                  <EditOutlined key="edit" onClick={() => {
-                    setModal({ type: 'EDIT_CARD', listId })
-                  }} />
+                  <EditOutlined
+                    key="edit"
+                    onClick={() => {
+                      setModal({ type: "EDIT_CARD", listId, card });
+                    }}
+                  />
                 </Tooltip>,
                 <Popconfirm
                   title="Delete the card"
@@ -62,7 +111,7 @@ export default function TodoList({
                 title={card.title}
                 description={
                   <>
-                    <div>This is description {card.id}</div>
+                    <div>{card.description}</div>
                     <Avatar.Group
                       maxCount={2}
                       maxPopoverTrigger="click"

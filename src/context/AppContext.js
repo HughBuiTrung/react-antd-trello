@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { data } from "../components/data";
 
 export const AppContext = React.createContext();
 
 export const AppProvider = ({ children }) => {
   const [trackers, setTrackers] = React.useState(data);
-  const [idAddList, setIdAddList] = React.useState();
+  const [modal, setModal] = useState(null);
+
+  // const [idAddList, setIdAddList] = React.useState();
 
   function handleDragList(result) {
     const { source, destination } = result;
@@ -75,22 +77,71 @@ export const AppProvider = ({ children }) => {
   }
 
   function handleAddCard({ listId, values }) {
-    const card = {
-      ...values,
-      id: `card-${Date.now()}`,
+    if (modal.type === "ADD_CARD") {
+      const card = {
+        ...values,
+        id: `card-${Date.now()}`,
+      };
+      console.log("valueAdd: ", values);
+      trackers.lists[listId].cards.push(card.id);
+      console.log("trackers: ", trackers);
+
+      const cards = {
+        ...trackers.cards,
+        [card.id]: {
+          id: card.id,
+          title: card.title,
+          description: card.description,
+          member: [
+            {
+              id: card.member,
+              name: card.member,
+            },
+          ],
+        },
+      };
+      setTrackers((prevState) => ({ ...prevState, cards }));
+
+      console.log("cards: ", cards);
     }
-    console.log("value: ", card, listId);
+    if (modal.type === "EDIT_CARD") handleEditCard();
   }
 
-  // console.log("idAddList: ", idAddList);
+  function handleEditCard(values) {
+    const id = modal.card.id;
+    const editCard = { ...values, id };
+    trackers.cards[id] = editCard;
+    setTrackers((prevState) => ({ ...prevState }));
+  }
 
+  function handleAddList(value) {
+    console.log("handleAddListConText: ", value);
+    const { columns } = trackers;
+    columns.push(value);
+    console.log("columns: ", columns);
+
+    const lists = {
+      ...trackers.lists,
+      [`list-${Date.now()}`]: {
+        id: `list-${Date.now()}`,
+        title: value,
+        cards: [],
+      },
+    };
+    setTrackers((prevState) => ({ ...prevState, lists }));
+    // console.log("cardssss: ", lists[lists.id].cards);
+    console.log("lists: ", lists);
+  }
+
+  console.log("modalAppContext: ", modal);
   console.log("trackers: ", trackers);
   return (
     <AppContext.Provider
       value={{
         // states
         trackers,
-
+        modal,
+        setModal,
         // actions
         handleDragList,
         handleDragCard,
@@ -98,6 +149,8 @@ export const AppProvider = ({ children }) => {
         handleDeleteCard,
         handleAddCard,
         handleTakeIdAddList,
+        handleEditCard,
+        handleAddList,
       }}
     >
       {children}
