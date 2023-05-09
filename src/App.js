@@ -176,7 +176,7 @@ function App() {
                                             <TodoCard
                                               index={cardIndex}
                                               card={cards}
-                                              key={cards.id}
+                                              key={cards._id}
                                               listId={listItem.id}
                                               setModal={setModal}
                                               columnsId={columnsId}

@@ -70,7 +70,7 @@ export default function TodoList({
 
   return (
     <>
-      <Draggable draggableId={String(card.id)} index={index}>
+      <Draggable draggableId={String(card._id)} index={index}>
         {(provided) => (
           <div
             ref={provided.innerRef}
@@ -95,7 +95,7 @@ export default function TodoList({
                 <Popconfirm
                   title="Delete the card"
                   description="Are you sure to delete this card?"
-                  onConfirm={() => onConfirm(card.id)}
+                  onConfirm={() => onConfirm(card._id)}
                   onCancel={() => {}}
                   okText="Yes"
                   cancelText="No"

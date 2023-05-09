@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { initialData } from "../components/data";
+import { initialData, data } from "../components/data";
 
 export const AppContext = React.createContext();
 
