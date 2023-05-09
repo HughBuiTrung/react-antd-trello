@@ -59,3 +59,10 @@ export const data = {
     },
   },
 };
+
+
+export const initialData = {
+  columns: [],
+  lists: {},
+  cards: {}
+}

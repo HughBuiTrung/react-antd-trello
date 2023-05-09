@@ -9,6 +9,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
 }
 
 code {
@@ -109,10 +110,9 @@ main {
   display: flex;
   flex-direction: column;
   word-break: break-all;
-  min-height: 10px;
-  overflow-x: hidden;
-  overflow-y: auto;
   margin-bottom: 0;
+  overflow: auto;
+  max-height: calc(100vh - 70px);
 }
 
 .cardList .ant-card-body {

@@ -1,13 +1,47 @@
 import React, { useState } from "react";
-import { data } from "../components/data";
+import { initialData } from "../components/data";
 
 export const AppContext = React.createContext();
 
 export const AppProvider = ({ children }) => {
-  const [trackers, setTrackers] = React.useState(data);
+  const [trackers, setTrackers] = React.useState(initialData);
   const [modal, setModal] = useState(null);
 
-  // const [idAddList, setIdAddList] = React.useState();
+  // fectch list todos
+  React.useEffect(() => {
+    fetch('https://cms-system-express-hpiu.vercel.app/api/todo')
+      .then(res => res.json())
+      .then(data => {
+        const todos = data.data;
+        console.log('todos: ', todos)
+        const listItem = {
+          id: "list-1",
+          title: "List 1",
+          cards: todos.map(todo => todo._id),
+        }
+        const cards = todos.reduce((acc, currItem) => {
+          acc[currItem._id] = currItem;
+          return acc;
+        }, {})
+        
+        setTrackers(prevState => {
+          return {
+            ...prevState,
+            columns: [].concat(listItem.id), // ['list-1']
+            lists: {
+              ...prevState.lists,
+              [listItem.id]: listItem
+            },
+            cards
+          }
+        })
+      })
+      .catch(err => {
+        // set state error
+      })
+  }, [])
+
+  console.log('trackers: ', trackers)
 
   function handleDragList(result) {
     const { source, destination } = result;
