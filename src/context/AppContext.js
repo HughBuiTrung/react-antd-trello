@@ -7,6 +7,7 @@ export const AppProvider = ({ children }) => {
   const [trackers, setTrackers] = React.useState(initialData);
   const [modal, setModal] = useState(null);
 
+
   // fectch list todos
   React.useEffect(() => {
     fetch('https://cms-system-express-hpiu.vercel.app/api/todo')
@@ -40,8 +41,6 @@ export const AppProvider = ({ children }) => {
         // set state error
       })
   }, [])
-
-  console.log('trackers: ', trackers)
 
   function handleDragList(result) {
     const { source, destination } = result;

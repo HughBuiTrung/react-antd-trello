@@ -12,14 +12,18 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
 
+// route
+import AuthRoute from "./router/AuthRoute";
+import GuestRoute from "./router/GuestRoute";
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
     <AppProvider>
       <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/" element={<AuthRoute><App /></AuthRoute>} />
+        <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+        <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
       </Routes>
     </AppProvider>
   </BrowserRouter>

@@ -33,6 +33,14 @@ function App() {
     setModal,
   } = useAppContext();
   // const [modal, setModal] = useState(null);
+
+
+  // call api to verify accessToken
+  // if accessToken is valid, set user info to context
+  // if accessToken is invalid, go back to Login page
+
+
+
   function onDragEnd(result) {
     const { destination, type } = result;
     if (!destination) return;
