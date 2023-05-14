@@ -6,42 +6,83 @@ export const AppContext = React.createContext();
 export const AppProvider = ({ children }) => {
   const [trackers, setTrackers] = React.useState(initialData);
   const [modal, setModal] = useState(null);
-
   // fectch list todos
   React.useEffect(() => {
-    fetch('https://cms-system-express-hpiu.vercel.app/api/todo')
-      .then(res => res.json())
-      .then(data => {
+    console.log("useEffect===================================================");
+    fetch("https://cms-system-express-hpiu.vercel.app/api/todo")
+      .then((res) => res.json())
+      .then((data) => {
         const todos = data.data;
-        console.log('todos: ', todos)
+        console.log("todos: ", todos);
         const listItem = {
           id: "list-1",
           title: "List 1",
-          cards: todos.map(todo => todo._id),
-        }
+          cards: todos.map((todo) => todo._id),
+        };
         const cards = todos.reduce((acc, currItem) => {
           acc[currItem._id] = currItem;
           return acc;
-        }, {})
-        
-        setTrackers(prevState => {
+        }, {});
+
+        setTrackers((prevState) => {
           return {
             ...prevState,
             columns: [].concat(listItem.id), // ['list-1']
             lists: {
               ...prevState.lists,
-              [listItem.id]: listItem
+              [listItem.id]: listItem,
             },
-            cards
-          }
-        })
+            cards,
+          };
+        });
       })
-      .catch(err => {
+      .catch((err) => {
         // set state error
-      })
-  }, [])
+      });
+  }, []);
 
-  console.log('trackers: ', trackers)
+  function handleAddCard({ listId, values }) {
+    fetch("https://cms-system-express-hpiu.vercel.app/api/todo", {
+      method: "POST",
+      body: JSON.stringify(values),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    })
+      .then((response) => response.json())
+      .then((json) => console.log("-=-=-=-=-=: ", json.data));
+
+    console.log("value: ", values);
+    // if (modal.type === "ADD_CARD") {
+    //   const card = {
+    //     ...values,
+    //     id: `card-${Date.now()}`,
+    //   };
+    //   console.log("valueAdd: ", values);
+    //   trackers.lists[listId].cards.push(card.id);
+    //   console.log("trackers: ", trackers);
+
+    //   const cards = {
+    //     ...trackers.cards,
+    //     [card.id]: {
+    //       id: card.id,
+    //       title: card.title,
+    //       description: card.description,
+    //       member: [
+    //         {
+    //           id: card.member,
+    //           name: card.member,
+    //         },
+    //       ],
+    //     },
+    //   };
+    //   setTrackers((prevState) => ({ ...prevState, cards }));
+
+    //   console.log("cards: ", cards);
+    // }
+    if (modal.type === "EDIT_CARD") handleEditCard();
+  }
+  console.log("trackers: ", trackers);
 
   function handleDragList(result) {
     const { source, destination } = result;
@@ -97,6 +138,9 @@ export const AppProvider = ({ children }) => {
   }
 
   function handleDeleteCard(cardId, columnsId) {
+    // fetch(`https://cms-system-express-hpiu.vercel.app/api/todo/${cardId}`, {
+    //   method: "DELETE",
+    // });
     console.log(trackers.lists[columnsId]);
     const cards = trackers.lists[columnsId].cards;
     const cardIndex = cards.findIndex((index) => index === cardId);
@@ -108,37 +152,6 @@ export const AppProvider = ({ children }) => {
   function handleTakeIdAddList() {
     // console.log("idAddList: ", idAddList);
     // setIdAddList(idAddList);
-  }
-
-  function handleAddCard({ listId, values }) {
-    if (modal.type === "ADD_CARD") {
-      const card = {
-        ...values,
-        id: `card-${Date.now()}`,
-      };
-      console.log("valueAdd: ", values);
-      trackers.lists[listId].cards.push(card.id);
-      console.log("trackers: ", trackers);
-
-      const cards = {
-        ...trackers.cards,
-        [card.id]: {
-          id: card.id,
-          title: card.title,
-          description: card.description,
-          member: [
-            {
-              id: card.member,
-              name: card.member,
-            },
-          ],
-        },
-      };
-      setTrackers((prevState) => ({ ...prevState, cards }));
-
-      console.log("cards: ", cards);
-    }
-    if (modal.type === "EDIT_CARD") handleEditCard();
   }
 
   function handleEditCard(values) {
@@ -165,7 +178,7 @@ export const AppProvider = ({ children }) => {
     // setTrackers((prevState) => ({ ...prevState, lists }));
     // console.log("cardssss: ", lists[lists.id].cards);
 
-    setTrackers(prevState => {
+    setTrackers((prevState) => {
       const nameList = `${value}-${Date.now()}`;
       return {
         ...prevState,
@@ -176,10 +189,10 @@ export const AppProvider = ({ children }) => {
             id: nameList,
             title: value,
             cards: [],
-          }
-        }
-      }
-    })
+          },
+        },
+      };
+    });
   }
 
   console.log("modalAppContext: ", modal);
