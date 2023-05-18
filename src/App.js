@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 // antd core
@@ -17,7 +17,6 @@ import { useAppContext } from "./context/AppContext";
 // Router
 
 import { Link } from "react-router-dom";
-import Login from "./components/Login";
 import ModalAppList from "./components/ModalAddList";
 
 function App() {

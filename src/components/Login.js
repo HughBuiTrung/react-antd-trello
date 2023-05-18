@@ -1,14 +1,35 @@
 import React from "react";
-import { Button, Checkbox, Form, Input } from "antd";
+import { Button, Form, Input } from "antd";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  console.log("Login");
-  const onFinish = (values) => {
-    console.log("Success:", values);
+  const navigate = useNavigate();
+
+  const onFinish = async (values) => {
+    // email: tony@gmail.com, password: 123456
+    const response = await fetch('https://tony-auth-express-cmylpcdza-nhattruong1811-gmailcom.vercel.app/api/user/login', {
+      method: "POST", // *GET, POST, PUT, DELETE, etc.
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(values), // body data type must match "Content-Type" header
+    });
+    const data = await response.json();
+    
+    // set token
+    window.localStorage.setItem("accessToken", data.token);
+
+    // redirect to home page
+    navigate("/");
   };
+
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
+
+
   };
+
   return (
     <div className="login">
       <Form
@@ -31,12 +52,12 @@ export default function Login() {
         autoComplete="off"
       >
         <Form.Item
-          label="Username"
-          name="username"
+          label="Email"
+          name="email"
           rules={[
             {
               required: true,
-              message: "Please input your username!",
+              message: "Please input your email!",
             },
           ]}
         >
@@ -54,17 +75,6 @@ export default function Login() {
           ]}
         >
           <Input.Password />
-        </Form.Item>
-
-        <Form.Item
-          name="remember"
-          valuePropName="checked"
-          wrapperCol={{
-            offset: 8,
-            span: 16,
-          }}
-        >
-          <Checkbox>Remember me</Checkbox>
         </Form.Item>
 
         <Form.Item

@@ -12,65 +12,6 @@ export const AppProvider = ({ children }) => {
   const [users, setUsers] = useState();
   const [todos, setTodos] = useState();
 
-  async function getAPI() {
-    // fetch lists
-    await fetch("https://cms-system-list.vercel.app/api/list")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("listttttttttttttttttttttttttttttttttttttttttttttttttt");
-        setLists(data.data);
-      })
-      .catch((err) => {
-        // set state error
-        console.log("API Error - ", err);
-      });
-
-    // fetch users
-    await fetch("https://cms-system-user.vercel.app/api/user")
-      .then((res) => res.json())
-      .then((data) => setUsers(data.data))
-      .catch((err) => {
-        // set state error
-        console.log("API Error - ", err);
-      });
-
-    // fetch todos
-    await fetch("https://cms-system-express.vercel.app/api/todo")
-      .then((res) => res.json())
-      .then((data) => setTodos(data.data))
-      .catch((err) => {
-        // set state error
-        console.log("API Error - ", err);
-      });
-  }
-
-  // fectch list todos
-  useEffect(() => {
-    console.log("useEffect===================================================");
-
-    // const array = [
-    //   fetch("https://cms-system-express.vercel.app/api/todo"),
-    //   fetch("https://cms-system-list.vercel.app/api/list"),
-    //   fetch("https://cms-system-user.vercel.app/api/user"),
-    // ];
-    // async function main() {
-    //   try {
-    //     const res = await Promise.all(array);
-    //     const data = await Promise.all(
-    //       res.map((item) => {
-    //         return item.json();
-    //       })
-    //     );
-    //     setTodos(data[0].data);
-    //     setLists(data[1].data);
-    //     setUsers(data[2].data);
-    //     console.log(data);
-    //   } catch (e) {}
-    // }
-    // main();
-    getAPI();
-  }, []);
-
   function takeInfor() {
     console.log("todos, lists, users: ", todos, lists, users);
     const listItem = {
@@ -284,17 +225,6 @@ export const AppProvider = ({ children }) => {
         handleAddList,
       }}
     >
-      <button onClick={takeInfor} type="button">
-        get
-      </button>
-      <button
-        onClick={() => {
-          setFlag(flag + 1);
-        }}
-        type="button"
-      >
-        +1
-      </button>
       {children}
     </AppContext.Provider>
   );
