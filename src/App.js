@@ -67,7 +67,7 @@ function App() {
   function handleAddAnotherList(value) {
     handleAddList(value);
   }
-
+  console.log("APP");
   return (
     <>
       <header>

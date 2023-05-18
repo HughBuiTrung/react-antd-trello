@@ -1,48 +1,103 @@
-import React, { useState } from "react";
-import { initialData, data } from "../components/data";
+import React, { useEffect, useState } from "react";
+import { initialData } from "../components/data";
+import App from "../App";
 
 export const AppContext = React.createContext();
 
 export const AppProvider = ({ children }) => {
   const [trackers, setTrackers] = React.useState(initialData);
   const [modal, setModal] = useState(null);
-  // fectch list todos
-  React.useEffect(() => {
-    console.log("useEffect===================================================");
-    fetch("https://cms-system-express-hpiu.vercel.app/api/todo")
+  const [flag, setFlag] = useState(0);
+  const [lists, setLists] = useState();
+  const [users, setUsers] = useState();
+  const [todos, setTodos] = useState();
+
+  async function getAPI() {
+    // fetch lists
+    await fetch("https://cms-system-list.vercel.app/api/list")
       .then((res) => res.json())
       .then((data) => {
-        const todos = data.data;
-        console.log("todos: ", todos);
-        const listItem = {
-          id: "list-1",
-          title: "List 1",
-          cards: todos.map((todo) => todo._id),
-        };
-        const cards = todos.reduce((acc, currItem) => {
-          acc[currItem._id] = currItem;
-          return acc;
-        }, {});
-
-        setTrackers((prevState) => {
-          return {
-            ...prevState,
-            columns: [].concat(listItem.id), // ['list-1']
-            lists: {
-              ...prevState.lists,
-              [listItem.id]: listItem,
-            },
-            cards,
-          };
-        });
+        console.log("listttttttttttttttttttttttttttttttttttttttttttttttttt");
+        setLists(data.data);
       })
       .catch((err) => {
         // set state error
+        console.log("API Error - ", err);
       });
+
+    // fetch users
+    await fetch("https://cms-system-user.vercel.app/api/user")
+      .then((res) => res.json())
+      .then((data) => setUsers(data.data))
+      .catch((err) => {
+        // set state error
+        console.log("API Error - ", err);
+      });
+
+    // fetch todos
+    await fetch("https://cms-system-express.vercel.app/api/todo")
+      .then((res) => res.json())
+      .then((data) => setTodos(data.data))
+      .catch((err) => {
+        // set state error
+        console.log("API Error - ", err);
+      });
+  }
+
+  // fectch list todos
+  useEffect(() => {
+    console.log("useEffect===================================================");
+
+    // const array = [
+    //   fetch("https://cms-system-express.vercel.app/api/todo"),
+    //   fetch("https://cms-system-list.vercel.app/api/list"),
+    //   fetch("https://cms-system-user.vercel.app/api/user"),
+    // ];
+    // async function main() {
+    //   try {
+    //     const res = await Promise.all(array);
+    //     const data = await Promise.all(
+    //       res.map((item) => {
+    //         return item.json();
+    //       })
+    //     );
+    //     setTodos(data[0].data);
+    //     setLists(data[1].data);
+    //     setUsers(data[2].data);
+    //     console.log(data);
+    //   } catch (e) {}
+    // }
+    // main();
+    getAPI();
   }, []);
 
+  function takeInfor() {
+    console.log("todos, lists, users: ", todos, lists, users);
+    const listItem = {
+      id: "list-1",
+      title: "List-1",
+      cards: todos.map((todo) => todo._id),
+    };
+    const cards = todos.reduce((cardsAdded, currItem) => {
+      cardsAdded[currItem._id] = currItem;
+      return cardsAdded;
+    }, {});
+    console.log("cards: ", cards);
+    setTrackers((prevState) => {
+      return {
+        ...prevState,
+        columns: [].concat(listItem.id), // ['list-1']
+        lists: {
+          ...prevState.lists,
+          [listItem.id]: listItem,
+        },
+        cards,
+      };
+    });
+  }
+
   function handleAddCard({ listId, values }) {
-    fetch("https://cms-system-express-hpiu.vercel.app/api/todo", {
+    fetch("https://cms-system-express.vercel.app/api/todo", {
       method: "POST",
       body: JSON.stringify(values),
       headers: {
@@ -50,7 +105,8 @@ export const AppProvider = ({ children }) => {
       },
     })
       .then((response) => response.json())
-      .then((json) => console.log("-=-=-=-=-=: ", json.data));
+      .then((json) => console.log("handleAddCard: ", json.data));
+    setFlag(flag + 1);
 
     console.log("value: ", values);
     // if (modal.type === "ADD_CARD") {
@@ -82,7 +138,6 @@ export const AppProvider = ({ children }) => {
     // }
     if (modal.type === "EDIT_CARD") handleEditCard();
   }
-  console.log("trackers: ", trackers);
 
   function handleDragList(result) {
     const { source, destination } = result;
@@ -97,7 +152,6 @@ export const AppProvider = ({ children }) => {
 
   function handleDragCard(result) {
     const { source, destination } = result;
-    console.log("result: ", result);
 
     if (source.droppableId === destination.droppableId) {
       const cards = trackers.lists[source.droppableId].cards;
@@ -133,20 +187,21 @@ export const AppProvider = ({ children }) => {
     const columns = [...trackers.columns];
     const indexList = columns.findIndex((index) => index === listId);
     columns.splice(indexList, 1);
-    console.log(columns);
     setTrackers((prevState) => ({ ...prevState, columns }));
   }
 
   function handleDeleteCard(cardId, columnsId) {
-    // fetch(`https://cms-system-express-hpiu.vercel.app/api/todo/${cardId}`, {
-    //   method: "DELETE",
-    // });
-    console.log(trackers.lists[columnsId]);
-    const cards = trackers.lists[columnsId].cards;
-    const cardIndex = cards.findIndex((index) => index === cardId);
-    cards.splice(cardIndex, 1);
-    console.log(cards);
-    setTrackers((prevState) => ({ ...prevState }));
+    console.log("cardId: ", cardId);
+    fetch(`https://cms-system-express.vercel.app/api/todo/${cardId}`, {
+      method: "DELETE",
+    });
+    setFlag(flag + 1);
+    // console.log(trackers.lists[columnsId]);
+    // const cards = trackers.lists[columnsId].cards;
+    // const cardIndex = cards.findIndex((index) => index === cardId);
+    // cards.splice(cardIndex, 1);
+    // console.log(cards);
+    // setTrackers((prevState) => ({ ...prevState }));
   }
 
   function handleTakeIdAddList() {
@@ -163,6 +218,17 @@ export const AppProvider = ({ children }) => {
 
   function handleAddList(value) {
     console.log("handleAddListConText: ", value);
+    fetch("https://cms-system-list.vercel.app/api/list", {
+      method: "POST",
+      body: JSON.stringify({
+        title: value,
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    })
+      .then((response) => response.json())
+      .then((list) => console.log("tittleList: ", list.data));
     // const { columns } = trackers;
     // columns.push(value);
     // console.log("columns: ", columns);
@@ -194,9 +260,12 @@ export const AppProvider = ({ children }) => {
       };
     });
   }
-
-  console.log("modalAppContext: ", modal);
+  console.log("lists: ", lists);
+  console.log("users: ", users);
+  console.log("todos: ", todos);
   console.log("trackers: ", trackers);
+
+  console.log("flag: ", flag);
   return (
     <AppContext.Provider
       value={{
@@ -215,6 +284,17 @@ export const AppProvider = ({ children }) => {
         handleAddList,
       }}
     >
+      <button onClick={takeInfor} type="button">
+        get
+      </button>
+      <button
+        onClick={() => {
+          setFlag(flag + 1);
+        }}
+        type="button"
+      >
+        +1
+      </button>
       {children}
     </AppContext.Provider>
   );
