@@ -12,30 +12,39 @@ export const AppProvider = ({ children }) => {
   const [users, setUsers] = useState();
   const [todos, setTodos] = useState();
 
-  function takeInfor() {
-    console.log("todos, lists, users: ", todos, lists, users);
-    const listItem = {
-      id: "list-1",
-      title: "List-1",
-      cards: todos.map((todo) => todo._id),
-    };
-    const cards = todos.reduce((cardsAdded, currItem) => {
-      cardsAdded[currItem._id] = currItem;
-      return cardsAdded;
-    }, {});
-    console.log("cards: ", cards);
-    setTrackers((prevState) => {
-      return {
-        ...prevState,
-        columns: [].concat(listItem.id), // ['list-1']
-        lists: {
-          ...prevState.lists,
-          [listItem.id]: listItem,
-        },
-        cards,
-      };
-    });
-  }
+  // fectch lists todos users
+  React.useEffect(() => {
+    fetch("https://cms-system-express.vercel.app/api/todo")
+      .then((res) => res.json())
+      .then((data) => {
+        const todos = data.data;
+        console.log("todos: ", todos);
+        const listItem = {
+          id: "list-1",
+          title: "List 1",
+          cards: todos.map((todo) => todo._id),
+        };
+        const cards = todos.reduce((acc, currItem) => {
+          acc[currItem._id] = currItem;
+          return acc;
+        }, {});
+
+        setTrackers((prevState) => {
+          return {
+            ...prevState,
+            columns: [].concat(listItem.id), // ['list-1']
+            lists: {
+              ...prevState.lists,
+              [listItem.id]: listItem,
+            },
+            cards,
+          };
+        });
+      })
+      .catch((err) => {
+        // set state error
+      });
+  }, [flag]);
 
   function handleAddCard({ listId, values }) {
     fetch("https://cms-system-express.vercel.app/api/todo", {
@@ -159,7 +168,7 @@ export const AppProvider = ({ children }) => {
 
   function handleAddList(value) {
     console.log("handleAddListConText: ", value);
-    fetch("https://cms-system-list.vercel.app/api/list", {
+    fetch("https://cms-system-express.vercel.app/api/list", {
       method: "POST",
       body: JSON.stringify({
         title: value,
@@ -201,10 +210,6 @@ export const AppProvider = ({ children }) => {
       };
     });
   }
-  console.log("lists: ", lists);
-  console.log("users: ", users);
-  console.log("todos: ", todos);
-  console.log("trackers: ", trackers);
 
   console.log("flag: ", flag);
   return (

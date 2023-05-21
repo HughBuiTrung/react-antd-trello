@@ -20,6 +20,9 @@ import { Link } from "react-router-dom";
 import ModalAppList from "./components/ModalAddList";
 
 function App() {
+  // ACCESS TOKEN
+  const accessToken = localStorage.getItem("accessToken");
+
   const {
     trackers,
     handleDragList,
@@ -67,18 +70,23 @@ function App() {
     handleAddList(value);
   }
   console.log("APP");
+  var status = "";
+  accessToken != null ? (status = "Logout") : (status = "Login");
+  function handleDeleteAccessToken() {
+    localStorage.removeItem("accessToken");
+  }
   return (
     <>
       <header>
         <div className="header__container">
           <div className="header__logo" />
           <div className="header__right">
-            <div className="login">
-              <Link to="/login">Login</Link>
+            <div className="login_header">
+              <Link to="/login" onClick={handleDeleteAccessToken}>
+                {status}
+              </Link>
             </div>
-            <div className="register">
-              <Link to="/register">Register</Link>
-            </div>
+
             <div className="header__avatar">
               {/* <img src="/assets/images/avatar.png" alt="Avatar" /> */}
             </div>
