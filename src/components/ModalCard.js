@@ -1,21 +1,32 @@
-import React from 'react'
-import { useState } from 'react';
-import { Avatar, Modal, Input, Form, Select } from 'antd';
+import React, { useEffect } from "react";
+import { useState } from "react";
+import { Avatar, Tooltip, Modal, Input, Form, Select } from "antd";
+
+// context
+import { useAppContext } from "../context/AppContext";
 
 const { TextArea } = Input;
 const { Option } = Select;
 
-function ModalCard({ open, setOpen }) {
+export default function ModalCard() {
+  const { handleAddCard, modal, setModal, handleEditCard } = useAppContext();
+  var modalTitle = "";
   const [form] = Form.useForm();
   const [confirmLoading, setConfirmLoading] = useState(false);
 
   const handleSubmit = (values) => {
-    console.log('values: ', values)
+    handleAddCard({
+      listId: modal.listId,
+      values,
+    });
     setConfirmLoading(true);
+    form.resetFields();
+    setModal(null);
+    handleEditCard(values);
   };
 
   const handleCancel = () => {
-    setOpen(false);
+    setModal(null);
   };
 
   const handleChange = (value) => {
@@ -23,37 +34,58 @@ function ModalCard({ open, setOpen }) {
   };
 
 
+  React.useLayoutEffect(() => {
+    form.resetFields();  
+  })
+
+  if (!modal) return <></>;
+
+  if (modal.type === "ADD_CARD") {
+    modalTitle = "Add Card";
+  }
+  if (modal.type === "EDIT_CARD") {
+    modalTitle = "Edit Card";
+  }
+
+
   return (
     <Modal
-      title="Add Card"
-      open={open}
+      title={modalTitle}
+      open={Boolean(modal)}
       onOk={form.submit}
       onCancel={handleCancel}
-      confirmLoading={confirmLoading}
+      // confirmLoading={confirmLoading}
     >
       <br />
       <Form
         name="basic"
         form={form}
-        initialValues={{ status: 'new' }}
+        initialValues={{ 
+          title: modal?.card?.title,
+          description: modal?.card?.description,
+          member: modal?.card?.member?.length > 0 ? modal?.card?.member.map(item => item.name) : [],
+          status: "new" ,
+        }}
         onFinish={handleSubmit}
         autoComplete="off"
-        labelCol={{ flex: '110px' }}
+        labelCol={{ flex: "110px" }}
         labelAlign="left"
         wrapperCol={{ flex: 1 }}
       >
         <Form.Item
           label="Title"
           name="title"
-          rules={[{ required: true, message: 'Please input your title!' }]}
+          rules={[{ required: true, message: "Please input your title!" }]}
         >
-          <Input />
+          <Input  />
         </Form.Item>
 
         <Form.Item
           label="Description"
           name="description"
-          rules={[{ required: true, message: 'Please input your description!' }]}
+          rules={[
+            { required: true, message: "Please input your description!" },
+          ]}
         >
           <TextArea rows={4} />
         </Form.Item>
@@ -61,12 +93,14 @@ function ModalCard({ open, setOpen }) {
         <Form.Item
           label="Member"
           name="member"
-          rules={[{ required: true, message: 'Please input your description!' }]}
+          rules={[
+            { required: true, message: "Please input your description!" },
+          ]}
         >
           <Select
             mode="multiple"
             allowClear
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             placeholder="Please select"
             optionLabelProp="label"
             onChange={handleChange}
@@ -86,32 +120,27 @@ function ModalCard({ open, setOpen }) {
           </Select>
         </Form.Item>
 
-        <Form.Item
-          label="Status"
-          name="status"
-        >
+        <Form.Item label="Status" name="status">
           <Select
             style={{ width: 120 }}
             onChange={handleChange}
             options={[
               {
-                value: 'new',
-                label: 'New',
+                value: "new",
+                label: "New",
               },
               {
-                value: 'inprocess',
-                label: 'In process',
+                value: "inprocess",
+                label: "In process",
               },
               {
-                value: 'done',
-                label: 'Done',
+                value: "done",
+                label: "Done",
               },
             ]}
           />
         </Form.Item>
       </Form>
     </Modal>
-  )
+  );
 }
-
-export default ModalCard

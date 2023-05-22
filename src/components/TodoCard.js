@@ -1,36 +1,60 @@
-import { Draggable } from 'react-beautiful-dnd';
-import { Card, Avatar, Tooltip, Popconfirm, Modal } from 'antd';
-import { EditOutlined, DeleteOutlined, AntDesignOutlined, UserOutlined, FileTextOutlined } from '@ant-design/icons';
+import React, { useState } from "react";
+import { Card, Avatar, Tooltip, Popconfirm, Modal } from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  AntDesignOutlined,
+  UserOutlined,
+  FileTextOutlined,
+} from "@ant-design/icons";
+import Meta from "antd/es/card/Meta";
+import { Draggable } from "react-beautiful-dnd";
+import { useAppContext } from "../context/AppContext";
+export default function TodoList({
+  index,
+  card,
+  setModal,
+  columnsId,
+  takeIdCard,
+  listId,
+  modal,
+}) {
+  function onConfirm(cardId) {
+    console.log("cardId: ", cardId);
+    console.log("columnsId: ", columnsId);
+    takeIdCard(cardId, columnsId);
+  }
 
-const { Meta } = Card;
+  function handleView() {
+    const { member } = card;
 
-export function TodoCard({ card, index, setOpen }) {
-  function handleViewDetail() {
     Modal.info({
-      title: 'Card Detail',
+      title: "Card Detail",
       content: (
         <>
           <div>
             <h4>Title</h4>
-            <div>This is title</div>
+            <div>{card.title}</div>
           </div>
           <br />
           <div>
             <h4>Description</h4>
-            <div>This is description</div>
+            <div>{card.description}</div>
           </div>
           <br />
           <div>
             <h4>Member</h4>
             <div>
-              <Avatar.Group>
+              {member[0].name}
+
+              {/* <Avatar.Group>
                 <Tooltip title="Tony Nguyen" placement="top">
                   <Avatar src="https://picsum.photos/265/160" />
                 </Tooltip>
                 <Tooltip title="Phuong Nguyen" placement="top">
                   <Avatar src="https://picsum.photos/265/160" />
                 </Tooltip>
-              </Avatar.Group>
+              </Avatar.Group> */}
             </div>
           </div>
           <br />
@@ -46,7 +70,7 @@ export function TodoCard({ card, index, setOpen }) {
 
   return (
     <>
-      <Draggable draggableId={String(card.id)} index={index}>
+      <Draggable draggableId={String(card._id)} index={index}>
         {(provided) => (
           <div
             ref={provided.innerRef}
@@ -55,23 +79,23 @@ export function TodoCard({ card, index, setOpen }) {
           >
             <Card
               className="cardItem"
-              cover={
-                <img
-                  alt="example"
-                  src="https://picsum.photos/265/160"
-                />
-              }
+              cover={<img alt="example" src="https://picsum.photos/265/160" />}
               actions={[
                 <Tooltip title="View">
-                  <FileTextOutlined key="view" onClick={handleViewDetail} />
+                  <FileTextOutlined key="view" onClick={handleView} />
                 </Tooltip>,
                 <Tooltip title="Edit">
-                  <EditOutlined key="edit" onClick={() => setOpen(true)} />
+                  <EditOutlined
+                    key="edit"
+                    onClick={() => {
+                      setModal({ type: "EDIT_CARD", listId, card });
+                    }}
+                  />
                 </Tooltip>,
                 <Popconfirm
                   title="Delete the card"
                   description="Are you sure to delete this card?"
-                  onConfirm={() => {}}
+                  onConfirm={() => onConfirm(card._id)}
                   onCancel={() => {}}
                   okText="Yes"
                   cancelText="No"
@@ -80,27 +104,37 @@ export function TodoCard({ card, index, setOpen }) {
                   <Tooltip title="Delete">
                     <DeleteOutlined key="ellipsis" />
                   </Tooltip>
-                </Popconfirm>
+                </Popconfirm>,
               ]}
             >
               <Meta
-                title="Learn javascript"
+                title={card.title}
                 description={
                   <>
-                    <div>This is description</div>
+                    <div>{card.description}</div>
                     <Avatar.Group
                       maxCount={2}
                       maxPopoverTrigger="click"
                       size="large"
-                      maxStyle={{ color: '#f56a00', backgroundColor: '#fde3cf', cursor: 'pointer' }}
+                      maxStyle={{
+                        color: "#f56a00",
+                        backgroundColor: "#fde3cf",
+                        cursor: "pointer",
+                      }}
                       className="avatarGroup"
                     >
                       <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
-                      <Avatar style={{ backgroundColor: '#f56a00' }}>K</Avatar>
+                      <Avatar style={{ backgroundColor: "#f56a00" }}>K</Avatar>
                       <Tooltip title="Ant User" placement="top">
-                        <Avatar style={{ backgroundColor: '#87d068' }} icon={<UserOutlined />} />
+                        <Avatar
+                          style={{ backgroundColor: "#87d068" }}
+                          icon={<UserOutlined />}
+                        />
                       </Tooltip>
-                      <Avatar style={{ backgroundColor: '#1890ff' }} icon={<AntDesignOutlined />} />
+                      <Avatar
+                        style={{ backgroundColor: "#1890ff" }}
+                        icon={<AntDesignOutlined />}
+                      />
                     </Avatar.Group>
                   </>
                 }
@@ -109,8 +143,6 @@ export function TodoCard({ card, index, setOpen }) {
           </div>
         )}
       </Draggable>
-      <br />
-
     </>
-  )
+  );
 }

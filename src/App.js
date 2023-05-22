@@ -1,145 +1,231 @@
+import React from "react";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
-import React, { useState, useCallback } from 'react';
-import { Card, Tooltip, Button, Popconfirm } from 'antd';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+// antd core
+import { Card, Tooltip, Button, Popconfirm } from "antd";
+
+// antd icon
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 
 // components
-import { TodoCard } from './components/TodoCard';
-import ModalCard from './components/ModalCard';
+import TodoCard from "./components/TodoCard";
+import ModalCard from "./components/ModalCard";
 
-// mock data
-import { data } from './data';
+// context
+import { useAppContext } from "./context/AppContext";
 
-const options = [];
-for (let i = 10; i < 36; i++) {
-  options.push({
-    label: i.toString(36) + i,
-    value: i.toString(36) + i,
-  });
-}
+// Router
+
+import { Link } from "react-router-dom";
+import ModalAppList from "./components/ModalAddList";
 
 function App() {
-  const [open, setOpen] = useState(false);
- 
-  const onDragEnd = (result) => {
-    console.log('onDragEnd', result)
-    // the only one that is required
+  // ACCESS TOKEN
+  const accessToken = localStorage.getItem("accessToken");
+
+  const {
+    trackers,
+    handleDragList,
+    handleDragCard,
+    handleDeleteList,
+    handleDeleteCard,
+    handleTakeIdAddList,
+    handleAddList,
+    modal,
+    setModal,
+  } = useAppContext();
+  // const [modal, setModal] = useState(null);
+  function onDragEnd(result) {
+    const { destination, type } = result;
+    if (!destination) return;
+
+    // drag list
+    if (type === "LIST") {
+      handleDragList(result);
+      return;
+    }
+    // drag card
+    if (type === "CARD") {
+      handleDragCard(result);
+      return;
+    }
+
+    // drag card
+    // handleDragCard(result);
   }
 
+  function onConfirm(listId) {
+    handleDeleteList(listId);
+  }
+
+  function takeIdCard(cardId, columnsId) {
+    handleDeleteCard(cardId, columnsId);
+  }
+
+  function takeIdAddList(idAddList) {
+    handleTakeIdAddList(idAddList);
+  }
+
+  function handleAddAnotherList(value) {
+    handleAddList(value);
+  }
+  console.log("APP");
+  var status = "";
+  accessToken != null ? (status = "Logout") : (status = "Login");
+  function handleDeleteAccessToken() {
+    localStorage.removeItem("accessToken");
+  }
   return (
     <>
       <header>
         <div className="header__container">
-          <div className="header__logo" />  
-            <div className="header__right">
-              <div className="header__avatar">
-                <img src="/assets/images/avatar.png" alt="Avatar" />
-              </div>
+          <div className="header__logo" />
+          <div className="header__right">
+            <div className="login_header">
+              <Link to="/login" onClick={handleDeleteAccessToken}>
+                {status}
+              </Link>
+            </div>
+
+            <div className="header__avatar">
+              {/* <img src="/assets/images/avatar.png" alt="Avatar" /> */}
             </div>
           </div>
-        </header>
+        </div>
+      </header>
 
-        <main>
-          <div className="container">
-            <div className="content">
-              <DragDropContext
-                onDragEnd={onDragEnd}
+      <main>
+        <div className="container">
+          <div className="content">
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable
+                droppableId="all-list"
+                type="LIST"
+                direction="horizontal"
               >
-                <Droppable droppableId="all-lists" direction='horizontal' type="LIST">
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      className="listContainer"
-                      {...provided.droppableProps}
-                    >
-                      {data.columns.map((columnId, index) => {
-                        const listItem = data.lists[columnId];
-                        const cards = listItem.cards.map((cardId) => data.cards[cardId]);
-                        const listId = listItem.id;
-                        const title = listItem.title;
+                {(provided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className="listContainer"
+                  >
+                    {trackers.columns.map((columnsId, index) => {
+                      const listItem = trackers.lists[columnsId];
+                      const cards = listItem.cards.map((cardId) => {
+                        return trackers.cards[cardId];
+                      });
 
-                        return (
-                          <React.Fragment key={listId}>
-                            <Draggable draggableId={String(listId)} index={index}>
-                              {(provided) => (
-                                  <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                  >
-                                    <Droppable droppableId={String(listId)} type="CARD">
-                                      {(provided) => (
-                                        <Card title={title}
-                                          className="cardList"
-                                          extra={
-                                            <>
-                                              <Tooltip title="Add a card">
-                                                <Button shape="circle" icon={<PlusOutlined />} onClick={() => setOpen(true)} />
-                                              </Tooltip>
+                      return (
+                        <React.Fragment key={listItem.id}>
+                          <Draggable
+                            draggableId={String(listItem.id)}
+                            index={index}
+                          >
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                              >
+                                <Droppable
+                                  droppableId={String(listItem.id)}
+                                  type="CARD"
+                                  direction="vertical"
+                                >
+                                  {(provided) => (
+                                    <Card
+                                      title={listItem.title}
+                                      className="cardList"
+                                      extra={
+                                        <>
+                                          <Tooltip title="Add a card">
+                                            <Button
+                                              shape="circle"
+                                              icon={<PlusOutlined />}
+                                              onClick={() => {
+                                                setModal({
+                                                  type: "ADD_CARD",
+                                                  listId: listItem.id,
+                                                });
+                                              }}
+                                            />
+                                          </Tooltip>
 
-                                              <Popconfirm
-                                                title="Delete the list"
-                                                description="Are you sure to delete this list?"
-                                                onConfirm={() => {}}
-                                                onCancel={() => {}}
-                                                okText="Yes"
-                                                cancelText="No"
-                                                className="ml-10"
-                                              >
-                                                <Tooltip title="Delete this list">
-                                                  <Button shape="circle" icon={<DeleteOutlined />} />
-                                                </Tooltip>
-                                              </Popconfirm>
-                                            </>
-                                          } 
-                                        >
-                                          <div
-                                            ref={provided.innerRef}
-                                            {...provided.droppableProps}
+                                          <Popconfirm
+                                            title="Delete the list"
+                                            description="Are you sure to delete this list?"
+                                            onConfirm={() =>
+                                              onConfirm(listItem.id)
+                                            }
+                                            onCancel={() => {}}
+                                            okText="Yes"
+                                            cancelText="No"
+                                            className="ml-10"
                                           >
-                                              {cards.map((card, cardIndex) => {
-                                                return (
-                                                  <TodoCard 
-                                                    key={card.id} 
-                                                    index={cardIndex} 
-                                                    card={card}
-                                                    setOpen={setOpen}
-                                                  />
-                                                )
-                                              })}
-                                          </div>
-                                          {provided.placeholder}
-                                        </Card>
-                                      )}
-                                    </Droppable>
-                                </div>
-                              )}
-                            </Draggable>
-                          </React.Fragment>
-                  
-                        )
-                      })}
-                      
-                      {provided.placeholder}
+                                            <Tooltip title="Delete this list">
+                                              <Button
+                                                shape="circle"
+                                                icon={<DeleteOutlined />}
+                                              />
+                                            </Tooltip>
+                                          </Popconfirm>
+                                        </>
+                                      }
+                                    >
+                                      <div
+                                        ref={provided.innerRef}
+                                        style={{}}
+                                        className="todoList__content"
+                                        {...provided.droppableProps}
+                                      >
+                                        {cards.map((cards, cardIndex) => (
+                                          <>
+                                            <TodoCard
+                                              index={cardIndex}
+                                              card={cards}
+                                              key={cards._id}
+                                              listId={listItem.id}
+                                              setModal={setModal}
+                                              columnsId={columnsId}
+                                              takeIdCard={takeIdCard}
+                                              modal={modal}
+                                            />
+                                            <br />
+                                          </>
+                                        ))}
 
-                    </div>
-                  )}
-                </Droppable>
+                                        {provided.placeholder}
+                                      </div>
+                                    </Card>
+                                  )}
+                                </Droppable>
+                              </div>
+                            )}
+                          </Draggable>
+                        </React.Fragment>
+                      );
+                    })}
 
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
 
-              </DragDropContext>
-              <Button type="text"><PlusOutlined /> Add another list</Button>
-             
-            
-            </div>
+              <ModalAppList handleAddAnotherList={handleAddAnotherList} />
+
+              {/* <Button type="text" onClick={handleAddAnotherList}>
+                <PlusOutlined />
+                Add another list
+              </Button> */}
+            </DragDropContext>
           </div>
-        </main>
-        
-        <ModalCard 
-          open={open}
-          setOpen={setOpen}
-        />
+        </div>
+      </main>
+
+      <ModalCard />
+
+      {/* <Login />
+      <Register /> */}
     </>
   );
 }
