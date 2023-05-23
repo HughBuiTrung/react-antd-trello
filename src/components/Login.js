@@ -37,7 +37,7 @@ export default function Login() {
   return (
     <div className="backGround_login">
       <div>
-        <h1 className="login_page">Login Page</h1>
+        <h1 className="login_page">Login</h1>
         <Lottie className="lottie" animationData={login} loop={true} />
       </div>
 
@@ -92,6 +92,7 @@ export default function Login() {
               offset: 8,
               span: 16,
             }}
+            style={{ textAlign: "center" }}
           >
             <Button type="primary" htmlType="submit">
               Login

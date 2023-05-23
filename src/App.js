@@ -111,14 +111,14 @@ function App() {
                   >
                     {trackers.columns.map((columnsId, index) => {
                       const listItem = trackers.lists[columnsId];
-                      const cards = listItem.cards.map((cardId) => {
+                      const cards = listItem.cards?.map((cardId) => {
                         return trackers.cards[cardId];
                       });
 
                       return (
-                        <React.Fragment key={listItem.id}>
+                        <React.Fragment key={listItem._id}>
                           <Draggable
-                            draggableId={String(listItem.id)}
+                            draggableId={String(listItem._id)}
                             index={index}
                           >
                             {(provided) => (
@@ -128,7 +128,7 @@ function App() {
                                 {...provided.dragHandleProps}
                               >
                                 <Droppable
-                                  droppableId={String(listItem.id)}
+                                  droppableId={String(listItem._id)}
                                   type="CARD"
                                   direction="vertical"
                                 >
@@ -145,7 +145,7 @@ function App() {
                                               onClick={() => {
                                                 setModal({
                                                   type: "ADD_CARD",
-                                                  listId: listItem.id,
+                                                  listId: listItem._id,
                                                 });
                                               }}
                                             />
@@ -155,7 +155,7 @@ function App() {
                                             title="Delete the list"
                                             description="Are you sure to delete this list?"
                                             onConfirm={() =>
-                                              onConfirm(listItem.id)
+                                              onConfirm(listItem._id)
                                             }
                                             onCancel={() => {}}
                                             okText="Yes"
@@ -184,7 +184,7 @@ function App() {
                                               index={cardIndex}
                                               card={cards}
                                               key={cards._id}
-                                              listId={listItem.id}
+                                              listId={listItem._id}
                                               setModal={setModal}
                                               columnsId={columnsId}
                                               takeIdCard={takeIdCard}

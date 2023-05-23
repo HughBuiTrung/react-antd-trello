@@ -45,7 +45,7 @@ export default function TodoList({
           <div>
             <h4>Member</h4>
             <div>
-              {member[0].name}
+              {member[0]}
 
               {/* <Avatar.Group>
                 <Tooltip title="Tony Nguyen" placement="top">

@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Checkbox, Form, Input } from "antd";
+import { Button, Form, Input } from "antd";
 import { Link } from "react-router-dom";
 import Lottie from "lottie-react";
 import registerAnimation from "../87718-waiting-register.json";
@@ -7,6 +7,15 @@ import registerAnimation from "../87718-waiting-register.json";
 export default function Register() {
   const onFinish = (values) => {
     console.log("Success:", values);
+    fetch("https://cms-system-express.vercel.app/api/user", {
+      method: "POST",
+      body: JSON.stringify(values),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    })
+      .then((response) => response.json())
+      .then((json) => console.log(json));
   };
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
@@ -91,24 +100,11 @@ export default function Register() {
           </Form.Item>
 
           <Form.Item
-            label="Email"
-            name="email"
-            rules={[
-              {
-                required: true,
-                type: "email",
-                message: "Enter a valid email address!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
             wrapperCol={{
               offset: 8,
               span: 16,
             }}
+            style={{ textAlign: "center" }}
           >
             <Button type="primary" htmlType="submit">
               Register

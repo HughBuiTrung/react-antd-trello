@@ -14,51 +14,152 @@ export const AppProvider = ({ children }) => {
 
   // fectch lists todos users
   React.useEffect(() => {
-    fetch("https://cms-system-express.vercel.app/api/todo")
-      .then((res) => res.json())
-      .then((data) => {
-        const todos = data.data;
-        console.log("todos: ", todos);
-        const listItem = {
-          id: "list-1",
-          title: "List 1",
-          cards: todos.map((todo) => todo._id),
-        };
-        const cards = todos.reduce((acc, currItem) => {
+    const getData = [
+      fetch("https://cms-system-express.vercel.app/api/todo"),
+      fetch("https://cms-system-express.vercel.app/api/list"),
+    ];
+    const loadData = async () => {
+      try {
+        const res = await Promise.all(getData);
+        const data = await Promise.all(
+          res.map((item) => {
+            return item.json();
+          })
+        );
+        console.log(data);
+        const getTodos = data[0].data;
+        const getLists = data[1].data;
+        console.log("getTodos: ", getTodos);
+        console.log("getLists: ", getLists);
+
+        const cards = getTodos.reduce((acc, currItem) => {
           acc[currItem._id] = currItem;
           return acc;
         }, {});
+        console.log("cardsssssssss: ", cards);
+        const lists = getLists.reduce((acc, currItem) => {
+          acc[currItem._id] = currItem;
+          return acc;
+        }, {});
+        console.log("listsssssssssss: ", lists);
 
+        const listItem = {
+          id: ["list-1"],
+          title: "List 1",
+          cards: getTodos.map((todo) => todo._id),
+        };
+
+        console.log("listItemmmmmmmmmmmmmmmmm: ", listItem);
         setTrackers((prevState) => {
           return {
             ...prevState,
-            columns: [].concat(listItem.id), // ['list-1']
-            lists: {
-              ...prevState.lists,
-              [listItem.id]: listItem,
-            },
+            columns: getLists.map((list) => list._id),
+            lists: lists,
             cards,
           };
         });
-      })
-      .catch((err) => {
-        // set state error
-      });
+      } catch (err) {
+        console.log("Multiple fetch failed");
+      }
+    };
+    loadData();
+    // const todos = data[0].data;
+    // console.log("todos: ", todos);
+    // console.log("lists: ", lists);
+    // const listItem = {
+    //   id: "list-1",
+    //   title: "List 1",
+    //   cards: todos.map((todo) => todo._id),
+    // };
+    // const cards = todos.reduce((acc, currItem) => {
+    //   acc[currItem._id] = currItem;
+    //   return acc;
+    // }, {});
+    // setTrackers((prevState) => {
+    //   return {
+    //     ...prevState,
+    //     columns: [].concat(listItem.id), // ['list-1']
+    //     lists: {
+    //       ...prevState.lists,
+    //       [listItem.id]: listItem,
+    //     },
+    //     cards,
+    //   };
+    // });
+    console.log("useEffect============================");
+
+    // console.log(todos);
+    // console.log(lists);
+    // fetch("https://cms-system-express.vercel.app/api/todo")
+    //   .then((res) => res.json())
+    //   .then((data) => {
+    //     const todos = data.data;
+    //     console.log("todos: ", todos);
+    //     console.log("lists: ", lists);
+    //     const listItem = {
+    //       id: "list-1",
+    //       title: "List 1",
+    //       cards: todos.map((todo) => todo._id),
+    //     };
+    //     const cards = todos.reduce((acc, currItem) => {
+    //       acc[currItem._id] = currItem;
+    //       return acc;
+    //     }, {});
+
+    //     setTrackers((prevState) => {
+    //       return {
+    //         ...prevState,
+    //         columns: [].concat(listItem.id), // ['list-1']
+    //         lists: {
+    //           ...prevState.lists,
+    //           [listItem.id]: listItem,
+    //         },
+    //         cards,
+    //       };
+    //     });
+    //   })
+    //   .catch((err) => {
+    //     // set state error
+    //   });
   }, [flag]);
 
+  // Add Card
   function handleAddCard({ listId, values }) {
-    fetch("https://cms-system-express.vercel.app/api/todo", {
-      method: "POST",
-      body: JSON.stringify(values),
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-      },
-    })
-      .then((response) => response.json())
-      .then((json) => console.log("handleAddCard: ", json.data));
-    setFlag(flag + 1);
+    console.log(listId);
+    console.log(values);
+    if (modal.type === "ADD_CARD") {
+      console.log("AddCard");
 
-    console.log("value: ", values);
+      fetch("https://cms-system-express.vercel.app/api/todo", {
+        method: "POST",
+        body: JSON.stringify(values),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      })
+        .then((response) => response.json())
+        .then((json) => {
+          const newCard = json.data;
+          console.log("handleAddCard: ", json.data);
+          fetch(`https://cms-system-express.vercel.app/api/list/${listId}`, {
+            method: "PUT",
+            body: JSON.stringify({
+              cards: [...trackers.lists[listId].cards, newCard._id],
+              //  newCard._id
+            }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+          })
+            .then((response) => response.json())
+            .then((json) => console.log("12313123: ", json));
+        });
+
+      setFlag(flag + 1);
+
+      console.log("value: ", values);
+    }
+
     // if (modal.type === "ADD_CARD") {
     //   const card = {
     //     ...values,
@@ -89,7 +190,28 @@ export const AppProvider = ({ children }) => {
     if (modal.type === "EDIT_CARD") handleEditCard();
   }
 
+  // Edit Card
+  function handleEditCard(values) {
+    console.log("EditCard");
+    const id = modal.card._id;
+    fetch(`https://cms-system-express.vercel.app/api/todo/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(values),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    })
+      .then((response) => response.json())
+      .then((json) => console.log(json));
+    setFlag(flag + 1);
+    // const editCard = { ...values, id };
+    // trackers.cards[id] = editCard;
+    // setTrackers((prevState) => ({ ...prevState }));
+  }
+
+  // Drag List
   function handleDragList(result) {
+    console.log(result);
     const { source, destination } = result;
     const columns = [...trackers.columns];
     const listSpliced = columns.splice(source.index, 1)[0];
@@ -100,6 +222,7 @@ export const AppProvider = ({ children }) => {
     }));
   }
 
+  // Drag Card
   function handleDragCard(result) {
     const { source, destination } = result;
 
@@ -133,18 +256,38 @@ export const AppProvider = ({ children }) => {
     }
   }
 
+  // Delete List
   function handleDeleteList(listId) {
+    console.log(listId);
+    fetch(`https://cms-system-express.vercel.app/api/list/${listId}`, {
+      method: "DELETE",
+    });
+    setFlag(flag + 1);
     const columns = [...trackers.columns];
     const indexList = columns.findIndex((index) => index === listId);
     columns.splice(indexList, 1);
     setTrackers((prevState) => ({ ...prevState, columns }));
   }
 
+  // Delete Card
   function handleDeleteCard(cardId, columnsId) {
-    console.log("cardId: ", cardId);
+    const listCard = trackers.lists[columnsId].cards;
+    const indexCard = listCard.findIndex((element) => element === cardId);
+    listCard.splice(indexCard, 1);
+
     fetch(`https://cms-system-express.vercel.app/api/todo/${cardId}`, {
       method: "DELETE",
     });
+    fetch(`https://cms-system-express.vercel.app/api/list/${columnsId}`, {
+      method: "PUT",
+      body: JSON.stringify(trackers.lists[columnsId]),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    })
+      .then((response) => response.json())
+      .then((json) => console.log(json));
+
     setFlag(flag + 1);
     // console.log(trackers.lists[columnsId]);
     // const cards = trackers.lists[columnsId].cards;
@@ -154,18 +297,7 @@ export const AppProvider = ({ children }) => {
     // setTrackers((prevState) => ({ ...prevState }));
   }
 
-  function handleTakeIdAddList() {
-    // console.log("idAddList: ", idAddList);
-    // setIdAddList(idAddList);
-  }
-
-  function handleEditCard(values) {
-    const id = modal.card.id;
-    const editCard = { ...values, id };
-    trackers.cards[id] = editCard;
-    setTrackers((prevState) => ({ ...prevState }));
-  }
-
+  // Add List
   function handleAddList(value) {
     console.log("handleAddListConText: ", value);
     fetch("https://cms-system-express.vercel.app/api/list", {
@@ -210,8 +342,11 @@ export const AppProvider = ({ children }) => {
       };
     });
   }
-
+  function handleFlag() {
+    setFlag(flag + 1);
+  }
   console.log("flag: ", flag);
+  console.log("tracker: ", trackers);
   return (
     <AppContext.Provider
       value={{
@@ -225,11 +360,11 @@ export const AppProvider = ({ children }) => {
         handleDeleteList,
         handleDeleteCard,
         handleAddCard,
-        handleTakeIdAddList,
         handleEditCard,
         handleAddList,
       }}
     >
+      <button onClick={handleFlag}>setFlag</button>
       {children}
     </AppContext.Provider>
   );
