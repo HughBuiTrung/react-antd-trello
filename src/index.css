@@ -42,11 +42,11 @@ main {
 }
 
 .header__container {
-  background-color: #1677ff;
+  background-color: #143a6e;
   box-sizing: border-box;
   display: flex;
-  min-height: 40px;
-  max-height: 40px;
+  min-height: 45px;
+  max-height: 45px;
   padding: 4px;
   display: flex;
   position: fixed;
@@ -93,6 +93,7 @@ main {
 }
 
 .content {
+  background: #6388bb;
   display: flex;
   align-items: flex-start;
   flex-direction: row;
@@ -102,16 +103,15 @@ main {
 }
 
 .cardList {
-  border-radius: 3px;
+  background: #c4dcf1;
+  border-radius: 10px;
   min-width: 320px;
   max-width: 300px;
   max-height: 100%;
   padding: 5px;
-  margin: 0 12px 0 0;
   display: flex;
   flex-direction: column;
   word-break: break-all;
-  margin-bottom: 0;
   overflow: auto;
   max-height: calc(100vh - 70px);
 }
@@ -159,7 +159,7 @@ main {
 }
 
 .todoList__content {
-  flex: 1 1 auto;
+  border-radius: 15px;
   padding: 0 5px;
   min-height: 10px;
   overflow-x: hidden;
@@ -209,4 +209,12 @@ main {
 .loginForm {
   margin-top: 190px;
   margin-left: 0;
+}
+[data-rbd-drag-handle-context-id="0"] {
+  margin: 10px;
+  border-radius: 15px;
+}
+.ant-btn-primary,
+.ant-btn-primary:not(:disabled):hover {
+  background-color: #143a6e;
 }

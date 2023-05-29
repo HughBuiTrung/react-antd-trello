@@ -1,6 +1,6 @@
 import React from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-
+import { PoweroffOutlined } from "@ant-design/icons";
 // antd core
 import { Card, Tooltip, Button, Popconfirm } from "antd";
 
@@ -83,7 +83,9 @@ function App() {
           <div className="header__right">
             <div className="login_header">
               <Link to="/login" onClick={handleDeleteAccessToken}>
-                {status}
+                <Button type="primary" icon={<PoweroffOutlined />}>
+                  {status}
+                </Button>
               </Link>
             </div>
 

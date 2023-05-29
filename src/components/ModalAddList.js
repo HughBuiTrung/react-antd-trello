@@ -23,7 +23,7 @@ const ModalAppList = ({ handleAddAnotherList }) => {
 
   return (
     <>
-      <Button type="primary" onClick={showModal}>
+      <Button type="primary" onClick={showModal} style={{ margin: "10px" }}>
         <PlusOutlined />
         Add another list
       </Button>
