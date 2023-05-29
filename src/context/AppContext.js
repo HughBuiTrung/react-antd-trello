@@ -8,7 +8,7 @@ export const AppProvider = ({ children }) => {
   const [trackers, setTrackers] = React.useState(initialData);
   const [modal, setModal] = useState(null);
   const [flag, setFlag] = useState(0);
-
+  const [columns, setColums] = useState();
   // fectch lists todos users
   React.useEffect(() => {
     const getData = [
@@ -26,24 +26,27 @@ export const AppProvider = ({ children }) => {
         console.log(data);
         const getTodos = data[0].data;
         const getLists = data[1].data;
-        console.log("getTodos: ", getTodos);
-        console.log("getLists: ", getLists);
 
+        // CARDS
         const cards = getTodos.reduce((acc, currItem) => {
           acc[currItem._id] = currItem;
           return acc;
         }, {});
-        console.log("cardsssssssss: ", cards);
+
+        // LISTS
         const lists = getLists.reduce((acc, currItem) => {
           acc[currItem._id] = currItem;
           return acc;
         }, {});
-        console.log("listsssssssssss: ", lists);
 
+        // COLUMNS
+        const columns = getLists.map((list) => list._id);
+
+        // SET DATA
         setTrackers((prevState) => {
           return {
             ...prevState,
-            columns: getLists.map((list) => list._id),
+            columns: columns,
             lists: lists,
             cards,
           };
@@ -76,18 +79,7 @@ export const AppProvider = ({ children }) => {
         .then((response) => response.json())
         .then((json) => {
           const newCard = json.data;
-          // console.log("handleAddCard: ", json.data);
-          // trackers.lists[listId].cards.push(newCard._id);
-          // const cards = {
-          //   ...trackers.cards,
-          //   [newCard._id]: {
-          //     id: newCard._id,
-          //     title: newCard.title,
-          //     description: newCard.description,
-          //     member: newCard.member,
-          //   },
-          // };
-          // setTrackers((prevState) => ({ ...prevState, cards }));
+
           fetch(`https://cms-system-express.vercel.app/api/list/${listId}`, {
             method: "PUT",
             body: JSON.stringify({
@@ -99,17 +91,27 @@ export const AppProvider = ({ children }) => {
             },
           })
             .then((response) => response.json())
-            .then((json) => console.log("12313123: ", json));
+            .then((json) => console.log(json));
+          trackers.lists[listId].cards.push(newCard._id);
+          const cards = {
+            ...trackers.cards,
+            [newCard._id]: {
+              id: newCard._id,
+              title: newCard.title,
+              description: newCard.description,
+              member: newCard.member,
+            },
+          };
+          setTrackers((prevState) => ({ ...prevState, cards }));
         });
 
-      // setFlag(flag + 1);
-      console.log("add edit card ", trackers);
       console.log("value: ", values);
+
       console.log("ADD_CARD");
       setTimeout(() => {
         console.log("timeOut");
         setFlag(flag + 1);
-      }, 500);
+      }, 1000);
     }
 
     if (modal.type === "EDIT_CARD") {
@@ -141,6 +143,10 @@ export const AppProvider = ({ children }) => {
     const editCard = { ...values, id };
     trackers.cards[id] = editCard;
     setTrackers((prevState) => ({ ...prevState }));
+    setTimeout(() => {
+      console.log("timeOut");
+      setFlag(flag + 1);
+    }, 1000);
   }
 
   // Drag List
@@ -157,6 +163,7 @@ export const AppProvider = ({ children }) => {
     }));
     console.log(columns);
   }
+
   // Drag Card
   function handleDragCard(result) {
     console.log(result);
@@ -167,6 +174,7 @@ export const AppProvider = ({ children }) => {
       const cards = trackers.lists[source.droppableId].cards;
       const cardMove = cards.splice(source.index, 1);
       cards.splice(destination.index, 0, cardMove[0]);
+      console.log(": ", cards);
       setTrackers((prevState) => ({
         ...prevState,
       }));
@@ -191,53 +199,6 @@ export const AppProvider = ({ children }) => {
         };
       });
     }
-  }
-
-  // Delete List
-  function handleDeleteList(listId) {
-    console.log("11111111111111111111111111111111111", listId);
-    fetch(`https://cms-system-express.vercel.app/api/list/${listId}`, {
-      method: "DELETE",
-    });
-    const columns = [...trackers.columns];
-    const indexList = columns.findIndex((index) => index === listId);
-    columns.splice(indexList, 1);
-    setTrackers((prevState) => ({ ...prevState, columns }));
-    setTimeout(() => {
-      console.log("timeOut");
-      setFlag(flag + 1);
-    }, 500);
-  }
-
-  // Delete Card
-  function handleDeleteCard(cardId, columnsId) {
-    const listCard = trackers.lists[columnsId].cards;
-    const indexCard = listCard.findIndex((element) => element === cardId);
-    listCard.splice(indexCard, 1);
-
-    fetch(`https://cms-system-express.vercel.app/api/todo/${cardId}`, {
-      method: "DELETE",
-    });
-    fetch(`https://cms-system-express.vercel.app/api/list/${columnsId}`, {
-      method: "PUT",
-      body: JSON.stringify(trackers.lists[columnsId]),
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-      },
-    })
-      .then((response) => response.json())
-      .then((json) => console.log(json));
-
-    setTimeout(() => {
-      console.log("timeOut");
-      setFlag(flag + 1);
-    }, 500);
-    // console.log(trackers.lists[columnsId]);
-    // const cards = trackers.lists[columnsId].cards;
-    // const cardIndex = cards.findIndex((index) => index === cardId);
-    // cards.splice(cardIndex, 1);
-    // console.log(cards);
-    // setTrackers((prevState) => ({ ...prevState }));
   }
 
   // Add List
@@ -273,26 +234,55 @@ export const AppProvider = ({ children }) => {
     setTimeout(() => {
       console.log("timeOut");
       setFlag(flag + 1);
-    }, 500);
-
-    // setTrackers((prevState) => {
-    //   const nameList = `${value}-${Date.now()}`;
-    //   return {
-    //     ...prevState,
-    //     columns: [...prevState.columns, nameList],
-    //     lists: {
-    //       ...prevState.lists,
-    //       [nameList]: {
-    //         id: nameList,
-    //         title: value,
-    //         cards: [],
-    //       },
-    //     },
-    //   };
-    // });
+    }, 1000);
   }
-  function handleFlag() {
-    setFlag(flag + 1);
+
+  // Delete List
+  function handleDeleteList(listId) {
+    console.log("listId", listId);
+    fetch(`https://cms-system-express.vercel.app/api/list/${listId}`, {
+      method: "DELETE",
+    });
+    const columns = [...trackers.columns];
+    const indexList = columns.findIndex((index) => index === listId);
+    columns.splice(indexList, 1);
+    setTrackers((prevState) => ({ ...prevState, columns }));
+    setTimeout(() => {
+      console.log("timeOut");
+      setFlag(flag + 1);
+    }, 1000);
+    console.log(trackers.lists[listId]);
+  }
+
+  // Delete Card
+  function handleDeleteCard(cardId, columnsId) {
+    const listCard = trackers.lists[columnsId].cards;
+    const indexCard = listCard.findIndex((element) => element === cardId);
+    listCard.splice(indexCard, 1);
+
+    fetch(`https://cms-system-express.vercel.app/api/todo/${cardId}`, {
+      method: "DELETE",
+    });
+    fetch(`https://cms-system-express.vercel.app/api/list/${columnsId}`, {
+      method: "PUT",
+      body: JSON.stringify(trackers.lists[columnsId]),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    })
+      .then((response) => response.json())
+      .then((json) => console.log(json));
+
+    setTimeout(() => {
+      console.log("timeOut");
+      setFlag(flag + 1);
+    }, 500);
+    // console.log(trackers.lists[columnsId]);
+    // const cards = trackers.lists[columnsId].cards;
+    // const cardIndex = cards.findIndex((index) => index === cardId);
+    // cards.splice(cardIndex, 1);
+    // console.log(cards);
+    // setTrackers((prevState) => ({ ...prevState }));
   }
   console.log(trackers.columns[0]);
 
